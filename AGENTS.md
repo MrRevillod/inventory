@@ -116,7 +116,11 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   `/unlock` load reports it. 5 failed attempts lock it for 5 minutes.
 - `/settings` changes the PIN (verifying the current one) and logs out. Changing
   the PIN clears the cookie **on that device only** — other sessions stay valid
-  until they expire (30 days).
+  until they expire (30 days). The change-PIN inputs carry `novalidate`,
+  `autocomplete="off"` and **no `pattern`** on purpose: `type="password"` +
+  `autocomplete` makes password managers fill them, and the browser's native
+  `pattern` then blocks submission with a misleading English message. Zod on the
+  server validates and reports it in Spanish.
 
 ## SvelteKit 3 quirks (they differ from most tutorials / SvelteKit 2)
 

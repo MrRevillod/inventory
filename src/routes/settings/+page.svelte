@@ -141,6 +141,7 @@
 		<form
 			method="POST"
 			action="?/changePin"
+			novalidate
 			use:enhance={formHandler(() => {}, "PIN actualizado")}
 			class="mt-3 space-y-3"
 		>
@@ -151,8 +152,7 @@
 					type="password"
 					inputmode="numeric"
 					maxlength="8"
-					pattern="[0-9]{8}"
-					autocomplete="current-password"
+					autocomplete="off"
 					required
 					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 				>
@@ -164,8 +164,7 @@
 					type="password"
 					inputmode="numeric"
 					maxlength="8"
-					pattern="[0-9]{8}"
-					autocomplete="new-password"
+					autocomplete="off"
 					required
 					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 				>
@@ -179,8 +178,7 @@
 					type="password"
 					inputmode="numeric"
 					maxlength="8"
-					pattern="[0-9]{8}"
-					autocomplete="new-password"
+					autocomplete="off"
 					required
 					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 				>
