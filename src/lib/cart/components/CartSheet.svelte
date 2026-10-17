@@ -7,15 +7,28 @@
 	import ShoppingBag from "@lucide/svelte/icons/shopping-bag"
 
 	import BottomSheet from "#lib/shared/components/BottomSheet.svelte"
+	import ReceiptSheet from "#lib/cart/components/ReceiptSheet.svelte"
 
 	import { enhance } from "$app/forms"
 
 	import { cart } from "#lib/cart/cart.svelte"
 	import { Money } from "#lib/shared/value-objects/money.value"
-	import { toasts } from "#lib/shared/toast.svelte"
+	import { settings } from "#lib/settings/settings.svelte"
 	import { confetti } from "#lib/shared/confetti.svelte"
 
+	import type { ReceiptData, ReceiptItem } from "#lib/cart/dtos"
+
+	/** Shape returned by the `?/checkout` action. */
+	interface CheckoutPayload {
+		success: boolean
+		total: number
+		items: ReceiptItem[]
+		createdAt: string | null
+	}
+
 	let { open, onclose }: { open: boolean; onclose: () => void } = $props()
+
+	let receipt = $state<ReceiptData | null>(null)
 </script>
 
 <BottomSheet {open} title="Carrito" {onclose}>
@@ -72,11 +85,19 @@
 		use:enhance={() =>
 			async ({ result, update }) => {
 				if (result.type === "success") {
-					const total = cart.total
+					const payload = result.data as CheckoutPayload | undefined
 					cart.clear()
 					onclose()
-					toasts.show(`Venta registrada · ${Money.format(total)}`, "success")
 					confetti.fire()
+					if (payload?.createdAt) {
+						receipt = {
+							items: payload.items,
+							total: payload.total,
+							createdAt: payload.createdAt,
+							storeName: settings.value.storeName,
+							accent: settings.value.accent,
+						}
+					}
 				}
 				await update()
 			}}
@@ -104,3 +125,5 @@
 		Cancelar atención
 	</button>
 </BottomSheet>
+
+<ReceiptSheet {receipt} onclose={() => (receipt = null)} />

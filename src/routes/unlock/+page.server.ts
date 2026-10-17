@@ -1,11 +1,11 @@
 import { fail, redirect } from "@sveltejs/kit"
 
 import { pinSchema } from "#lib/auth/dtos"
-import { createSession, SESSION_COOKIE, SESSION_COOKIE_OPTIONS } from "#lib/auth/session"
 import { authService } from "#lib/auth/services"
+import { createSession, SESSION_COOKIE, SESSION_COOKIE_OPTIONS } from "#lib/auth/session"
 
-import type { AuthStatus, UnlockResult } from "#lib/auth/services"
 import type { Actions, PageServerLoad } from "./$types"
+import type { AuthStatus, UnlockResult } from "#lib/auth/services"
 
 interface Rejection {
 	action: "unlock"

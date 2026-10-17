@@ -12,6 +12,7 @@
 <button
 	type="button"
 	onclick={onadd}
+	aria-label={`Agregar ${product.name}`}
 	class="flex min-h-24 flex-col items-start gap-2 rounded-2xl bg-neutral-50 p-4 text-left ring-1 ring-neutral-200/60 transition-transform duration-150 active:scale-[0.96]"
 >
 	<span class="line-clamp-2 text-sm leading-snug font-semibold text-neutral-800"

@@ -6,6 +6,7 @@ import { checkoutSchema } from "#lib/cart/dtos"
 import { productsService } from "#lib/products/services"
 import { categoriesService } from "#lib/categories/services"
 
+import type { ReceiptItem } from "#lib/cart/dtos"
 import type { Actions, PageServerLoad } from "./$types"
 
 interface CheckoutResult {
@@ -13,7 +14,19 @@ interface CheckoutResult {
 	success: boolean
 	errors: Record<string, string[]>
 	total: number
+	/** The sale as recorded, so the receipt matches the database. */
+	items: ReceiptItem[]
+	createdAt: string | null
 }
+
+const rejected = (errors: Record<string, string[]>): CheckoutResult => ({
+	action: "checkout",
+	success: false,
+	errors,
+	total: 0,
+	items: [],
+	createdAt: null,
+})
 
 export const load: PageServerLoad = async () => {
 	const [categories, productsBySubcategory] = await Promise.all([
@@ -31,22 +44,12 @@ export const actions: Actions = {
 		try {
 			items = JSON.parse(String(form.get("cart") ?? "[]"))
 		} catch {
-			return fail(400, {
-				action: "checkout",
-				success: false,
-				errors: { cart: ["El carrito enviado no es válido"] },
-				total: 0,
-			} satisfies CheckoutResult)
+			return fail(400, rejected({ cart: ["El carrito enviado no es válido"] }))
 		}
 
 		const parsed = checkoutSchema.safeParse({ items })
 		if (!parsed.success) {
-			return fail(400, {
-				action: "checkout",
-				success: false,
-				errors: { cart: parsed.error.issues.map((issue) => issue.message) },
-				total: 0,
-			} satisfies CheckoutResult)
+			return fail(400, rejected({ cart: parsed.error.issues.map((issue) => issue.message) }))
 		}
 
 		try {
@@ -56,14 +59,15 @@ export const actions: Actions = {
 				success: true,
 				errors: {},
 				total: sale.total,
+				items: sale.items.map((item) => ({
+					name: item.name,
+					price: item.price,
+					quantity: item.quantity,
+				})),
+				createdAt: sale.createdAt.toISOString(),
 			} satisfies CheckoutResult
 		} catch {
-			return fail(400, {
-				action: "checkout",
-				success: false,
-				errors: { cart: ["Algunos productos ya no están disponibles"] },
-				total: 0,
-			} satisfies CheckoutResult)
+			return fail(400, rejected({ cart: ["Algunos productos ya no están disponibles"] }))
 		}
 	},
 }

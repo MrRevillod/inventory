@@ -168,7 +168,13 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   `$effect` — that loops with `effect_update_depth_exceeded`; clear it in the
   checkout form's `use:enhance` callback instead.
 - Checkout posts the cart as JSON to `?/checkout`; `cartService` re-reads prices
-  from the database, so client-sent prices are never trusted.
+  from the database, so client-sent prices are never trusted. The action returns
+  the recorded sale (lines, `total`, `createdAt`) so the receipt shows what the
+  database stored. `src/lib/cart/receipt.ts` draws that receipt with Canvas 2D
+  and `src/lib/shared/share.ts` shares the PNG through the Web Share API. File
+  sharing needs HTTPS, a user gesture and a browser that supports it, so the
+  image is rendered **before** the share button appears and a download stays as
+  the fallback.
 - Zod schemas live in each module's `dtos.ts` and use **Zod Mini**
   (`import * as z from "zod/mini"`); validators are functions passed to
   `.check(...)` (e.g. `z.trim()`, `z.minLength(1, msg)`), with `z.coerce`,
