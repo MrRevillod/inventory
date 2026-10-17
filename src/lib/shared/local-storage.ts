@@ -1,8 +1,8 @@
 import { browser } from "$app/env"
 
 export const STORAGE_KEYS = {
-	cart: "pymeapp:cart",
-	settings: "pymeapp:settings",
+	cart: "inventory:cart",
+	settings: "inventory:settings",
 } as const
 
 /** Typed `localStorage` wrapper. No-ops on the server (returns the fallback). */

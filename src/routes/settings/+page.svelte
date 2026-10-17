@@ -40,7 +40,7 @@
 				value={settings.value.storeName}
 				oninput={(event) => settings.patch({ storeName: event.currentTarget.value })}
 				maxlength="40"
-				placeholder="pymeapp"
+				placeholder="inventory"
 				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 			>
 		</label>

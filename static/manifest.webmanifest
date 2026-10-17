@@ -1,7 +1,7 @@
 {
 	"id": "/",
-	"name": "pymeapp",
-	"short_name": "pymeapp",
+	"name": "inventory",
+	"short_name": "inventory",
 	"description": "Punto de venta, inventario y servicios para tu salón de uñas.",
 	"lang": "es",
 	"dir": "ltr",

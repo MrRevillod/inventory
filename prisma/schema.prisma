@@ -1,4 +1,4 @@
-// Prisma schema for the pymeapp nail-salon POS.
+// Prisma schema for the inventory nail-salon POS.
 // Datasource URL lives in prisma.config.ts (Prisma ORM v7).
 // Auth tables (Better Auth) will be added in a later phase.
 

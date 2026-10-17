@@ -4,7 +4,7 @@ import { resolve } from "$app/paths"
 import { assets, immutable, prerendered } from "$app/manifest"
 
 // One cache per deployment, so a new build starts from a clean slate.
-const CACHE = `pymeapp-${version}`
+const CACHE = `inventory-${version}`
 
 // Paths in the manifest are relative to the base path, so resolve them to the
 // absolute pathnames that show up in `url.pathname` inside `fetch`.

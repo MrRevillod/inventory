@@ -3,11 +3,11 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-		<title>pymeapp</title>
+		<title>inventory</title>
 		<meta name="theme-color" content="#6300a6">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-		<meta name="apple-mobile-web-app-title" content="pymeapp">
+		<meta name="apple-mobile-web-app-title" content="inventory">
 		<meta name="mobile-web-app-capable" content="yes">
 		<link rel="manifest" href="/manifest.webmanifest">
 		<link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -17,7 +17,7 @@
 			// Apply stored settings before first paint to avoid a flash of the
 			// default accent color.
 			try {
-				var s = JSON.parse(localStorage.getItem("pymeapp:settings") || "null")
+				var s = JSON.parse(localStorage.getItem("inventory:settings") || "null")
 				if (s) {
 					var p = s.palette || {}
 					for (var k in p) {

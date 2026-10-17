@@ -44,7 +44,7 @@ export function applySettings(value: Settings) {
 function build(partial: Partial<Settings>): Settings {
 	const accent = partial.accent && isHexColor(partial.accent) ? partial.accent : DEFAULT_ACCENT
 	return {
-		storeName: partial.storeName ?? "pymeapp",
+		storeName: partial.storeName ?? "inventory",
 		accent,
 		uiScale: partial.uiScale ?? "normal",
 		radius: partial.radius ?? "round",

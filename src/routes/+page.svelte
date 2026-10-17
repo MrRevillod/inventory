@@ -81,7 +81,7 @@
 		</span>
 		<div class="min-w-0 flex-1">
 			<h1 class="truncate text-lg leading-tight font-extrabold tracking-tight">
-				{settings.value.storeName || "pymeapp"}
+				{settings.value.storeName || "inventory"}
 			</h1>
 			<p class="text-xs text-neutral-400">Punto de venta</p>
 		</div>

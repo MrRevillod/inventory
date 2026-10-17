@@ -57,7 +57,7 @@
 	>
 		<img
 			src="/pwa-192x192.png"
-			alt="pymeapp"
+			alt="inventory"
 			width="72"
 			height="72"
 			class="size-18 rounded-2xl shadow-sm"

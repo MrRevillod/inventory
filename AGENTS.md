@@ -2,7 +2,7 @@
 
 ## What this repo is
 
-PWA for a nail salon: inventory + services + point of sale ("pymeapp",
+PWA for a nail salon: inventory + services + point of sale ("inventory",
 formerly the Expo app "NailApp").
 
 - Stack: SvelteKit 3 + Svelte 5 (runes) + Tailwind v4 + Prisma 7 + PostgreSQL
@@ -119,7 +119,7 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
 - Client persistence goes through `LocalStorage`
   (`src/lib/shared/local-storage.ts`), a static-only class that does the JSON
   parse/stringify and no-ops on the server. Keys live in `STORAGE_KEYS`
-  (`pymeapp:cart`, `pymeapp:settings`). The `app.html` pre-paint script still
+  (`inventory:cart`, `inventory:settings`). The `app.html` pre-paint script still
   reads `localStorage` directly.
 - Server-only code (`shared/server/prisma.ts`, every `services.ts`, `catalog.ts`)
   must never be imported from client code.
