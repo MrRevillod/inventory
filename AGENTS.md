@@ -44,10 +44,10 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   `localhost:51214`. Start from `.env.example`.
 - Fresh setup order: `pnpm install` → `pnpm db:dev` → `pnpm db:generate` →
   `pnpm db:migrate` → `pnpm db:seed`.
-- The generated Prisma client lives in `src/lib/server/generated/prisma/` and is
-  **gitignored** (run `pnpm db:generate` after cloning). Import the client from
-  `.../generated/prisma/client`. Use the singleton in `src/lib/server/prisma.ts`
-  and never import it from client code.
+- The generated Prisma client lives in `src/lib/shared/server/generated/prisma/`
+  and is **gitignored** (run `pnpm db:generate` after cloning). Import it from
+  `.../generated/prisma/client`. Use the singleton in
+  `src/lib/shared/server/prisma.ts` and never import it from client code.
 - `prisma.config.ts` holds the datasource URL and seed command; migrations live
   in `prisma/migrations/` (committed).
 - After changing `prisma/schema.prisma`, run `pnpm db:generate` **and restart the
@@ -71,33 +71,64 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
 
 ## App structure
 
-- Routes: `/` is the point of sale (cart + checkout), `/inventario` is the
-  inventory CRUD and `/historial` lists past sales. Route files pair
-  `+page.server.ts` (a `load` plus named form actions) with `+page.svelte`.
-- Server-only code lives in `src/lib/server/` (`prisma.ts`, `catalog.ts`,
-  `sales.ts`). Never import it from client code.
-- The cart is client state in `src/lib/cart.svelte.ts` (runes + localStorage),
+- Code is organized by feature module under `src/lib/`: `categories/`,
+  `products/`, `cart/`, `history/`, `settings/` and `shared/`.
+- Each module has `dtos.ts` (Zod schemas + inferred types), `services.ts`
+  (a singleton service class, server-only) and `components/`. Service methods are
+  `public async` with explicit return types (Prisma model / payload types), and
+  their parameters use the zod-inferred DTO types (`CategoryInput`,
+  `SubcategoryInput`, `ProductInput`, `CheckoutInput`, `DateRange`) — never inline
+  object literals.
+- Services (exported singletons): `categoriesService` (categories +
+  subcategories), `productsService` (products + archiving), `cartService.checkout()`
+  (records sales), `historyService.list(range)`. `buildCatalog()`
+  (`categories/catalog.ts`) composes the navigation tree from categories +
+  products, keeping responsibilities separate.
+- Routes (`src/routes/*`) stay thin: `load` calls services, the page renders
+  module components. Route paths are in English while UI text stays Spanish:
+  `/` (POS), `/inventory`, `/history`, `/settings`.
+- Client persistence goes through `LocalStorage`
+  (`src/lib/shared/local-storage.ts`), a static-only class that does the JSON
+  parse/stringify and no-ops on the server. Keys live in `STORAGE_KEYS`
+  (`pymeapp:cart`, `pymeapp:settings`). The `app.html` pre-paint script still
+  reads `localStorage` directly.
+- Server-only code (`shared/server/prisma.ts`, every `services.ts`, `catalog.ts`)
+  must never be imported from client code.
+- The cart is client state in `src/lib/cart/cart.svelte.ts` (runes + localStorage),
   hydrated once from the layout via `$effect`. Do **not** clear it from an
   `$effect` — that loops with `effect_update_depth_exceeded`; clear it in the
   checkout form's `use:enhance` callback instead.
-- Checkout posts the cart as JSON to `?/checkout`. `createSale` re-reads prices
+- Checkout posts the cart as JSON to `?/checkout`; `cartService` re-reads prices
   from the database, so client-sent prices are never trusted.
-- Zod 4 schemas live in `src/lib/validation.ts`; money/date helpers in
-  `src/lib/money.ts` and `src/lib/date.ts`. Date-range math for the history lives
-  in `src/lib/period.ts` and assumes the `America/Santiago` timezone for day/month
-  boundaries (sales are stored in UTC).
-- Inventory form actions return `{ action, success, errors, values }`; the UI
-  submits them with `use:enhance` and shows failures as toasts.
+- Zod schemas live in each module's `dtos.ts` and use **Zod Mini**
+  (`import * as z from "zod/mini"`); validators are functions passed to
+  `.check(...)` (e.g. `z.trim()`, `z.minLength(1, msg)`), with `z.coerce`,
+  `z.catch(schema, fallback)` and `z.refine`. `Money` and `DateTime` are value
+  object classes in `src/lib/shared/value-objects/` (`static from`, `static
+  format`, `toDisplay`). Date-range math for the history lives in
+  `src/lib/history/period.ts` and assumes the `America/Santiago` timezone for
+  day/month boundaries (sales are stored in UTC).
+- Form actions return `{ action, success, errors, values }`; the UI submits them
+  with `use:enhance` + the shared `formHandler` (`src/lib/shared/form.ts`).
+- **Import order is manual** (Biome's `organizeImports` is intentionally off, and
+  it's removed from the Zed format actions too). Blocks separated by a blank line,
+  each sorted by imported-name length ascending; `default`, `named` and `type` are
+  each split into external packages first, then `#lib`/relative:
+  (1) side-effect, (2) default external, (3) default local, (4) named external,
+  (5) named local, (6) `import type` external, (7) `import type` local.
 
 ### UI
 
 - Mobile-first: a centered `max-w-md` column (`+layout.svelte`) with a fixed
-  bottom nav (`src/lib/components/BottomNav.svelte`) and iOS safe-area padding.
-  Give each page bottom padding (`pb-28`, or `pb-40` on the POS) so content
-  clears the nav.
-- Shared components live in `src/lib/components/` (`BottomNav`, `BottomSheet`,
-  `PageHeader`, `Toasts`); toasts are a store (`toasts.show`) in
-  `src/lib/toast.svelte.ts`.
+  bottom nav (`src/lib/shared/components/BottomNav.svelte`) and iOS safe-area
+  padding (top inset on the headers, bottom on the nav).
+- Shared components live in `src/lib/shared/components/` (`BottomNav`,
+  `BottomSheet`, `PageHeader`, `Toasts`, `Confetti`); toasts are a store in
+  `src/lib/shared/toast.svelte.ts`.
+- Module components: `categories/components/` (`CategoryIcon`, `CategoryTabs`,
+  `CategoryForm`, `SubcategoryForm`), `products/components/ProductForm.svelte`,
+  `cart/components/` (`ProductCard`, `CartBar`, `CartSheet`),
+  `history/components/SaleCard.svelte`.
 - Tailwind v4 tokens live in `src/routes/layout.css`: brand scale
   `--color-primary-50..900` (`#6300a6` = `primary-600`), plus `--color-primary`
   and the `animate-pop` / `animate-fade-up` keyframes. Prefer `bg-primary-600`,
@@ -106,20 +137,20 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   changes wrapped in `document.startViewTransition` via `onNavigate` in the
   layout. `prefers-reduced-motion` is respected globally in `layout.css`.
 - Subcategories carry an `icon` (Lucide name) and a `tone` (0–7); categories are
-  the top-level tabs (`src/lib/components/CategoryTabs.svelte`). The color is
-  derived from the accent via `accentTones()` in `src/lib/palette.ts`, so
-  changing the accent in Ajustes re-themes every subcategory. Render the icon via
-  `CategoryIcon.svelte`; apply the color with inline styles and `tint()` (Tailwind
-  can't generate colors at runtime).
-- Settings live in `src/lib/settings.svelte.ts` (localStorage: `storeName`,
-  `accent`, `uiScale`, `radius`, derived `palette`). `applySettings` overrides
-  `--color-primary-*`, the `--radius-*` scale and the root font size on `<html>`;
-  a small pre-paint inline script in `src/app.html` applies them early to avoid a
-  flash. The `/ajustes` screen edits them.
+  the top-level tabs (`src/lib/categories/components/CategoryTabs.svelte`). The
+  color is derived from the accent via `accentTones()` in
+  `src/lib/settings/palette.ts`, so changing the accent in Ajustes re-themes every
+  subcategory. Render the icon via `CategoryIcon.svelte`; apply the color with
+  inline styles and `tint()` (Tailwind can't generate colors at runtime).
+- Settings live in `src/lib/settings/settings.svelte.ts` (localStorage:
+  `storeName`, `accent`, `uiScale`, `radius`, derived `palette`). `applySettings`
+  overrides `--color-primary-*`, the `--radius-*` scale and the root font size on
+  `<html>`; a small pre-paint inline script in `src/app.html` applies them early to
+  avoid a flash. The `/settings` screen edits them.
 - Radii are tokenized: `rounded-lg/xl/2xl/3xl` and `rounded-pill` (used app-wide
   instead of `rounded-full`) read `--radius-*`, so the "Redondeo" profile can
   change every corner at runtime.
-- Sale celebration: `confetti.fire()` (`src/lib/confetti.svelte.ts`) drives
+- Sale celebration: `confetti.fire()` (`src/lib/shared/confetti.svelte.ts`) drives
   `Confetti.svelte` — a dependency-free CSS burst, skipped under reduced motion.
 
 ## Domain

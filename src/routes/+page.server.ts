@@ -1,7 +1,11 @@
 import { fail } from "@sveltejs/kit"
-import { listCatalog } from "#lib/server/catalog"
-import { createSale } from "#lib/server/sales"
-import { checkoutSchema } from "#lib/validation"
+
+import { cartService } from "#lib/cart/services"
+import { buildCatalog } from "#lib/categories/catalog"
+import { checkoutSchema } from "#lib/cart/dtos"
+import { productsService } from "#lib/products/services"
+import { categoriesService } from "#lib/categories/services"
+
 import type { Actions, PageServerLoad } from "./$types"
 
 interface CheckoutResult {
@@ -12,7 +16,11 @@ interface CheckoutResult {
 }
 
 export const load: PageServerLoad = async () => {
-	return { categories: await listCatalog() }
+	const [categories, productsBySubcategory] = await Promise.all([
+		categoriesService.list(),
+		productsService.listGroupedBySubcategory(),
+	])
+	return { categories: buildCatalog(categories, productsBySubcategory) }
 }
 
 export const actions: Actions = {
@@ -42,7 +50,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const sale = await createSale(parsed.data.items)
+			const sale = await cartService.checkout(parsed.data.items)
 			return {
 				action: "checkout",
 				success: true,

@@ -3,7 +3,7 @@
 // Run with `pnpm db:seed` against a migrated database.
 import "dotenv/config"
 import { PrismaPg } from "@prisma/adapter-pg"
-import { PrismaClient } from "../src/lib/server/generated/prisma/client"
+import { PrismaClient } from "../src/lib/shared/server/generated/prisma/client"
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })

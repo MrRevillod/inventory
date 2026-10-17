@@ -1,14 +1,19 @@
 <script lang="ts">
-	import LoaderCircle from "@lucide/svelte/icons/loader-circle"
-	import { fade } from "svelte/transition"
-	import { cart } from "#lib/cart.svelte"
-	import BottomNav from "#lib/components/BottomNav.svelte"
-	import Confetti from "#lib/components/Confetti.svelte"
-	import Toasts from "#lib/components/Toasts.svelte"
-	import { settings } from "#lib/settings.svelte"
-	import { onNavigate } from "$app/navigation"
 	import "./layout.css"
+
+	import LoaderCircle from "@lucide/svelte/icons/loader-circle"
+
+	import Toasts from "#lib/shared/components/Toasts.svelte"
 	import favicon from "#lib/assets/favicon.svg"
+	import Confetti from "#lib/shared/components/Confetti.svelte"
+	import BottomNav from "#lib/shared/components/BottomNav.svelte"
+
+	import { fade } from "svelte/transition"
+	import { onNavigate } from "$app/navigation"
+
+	import { cart } from "#lib/cart/cart.svelte"
+	import { settings } from "#lib/settings/settings.svelte"
+
 	import type { LayoutProps } from "./$types"
 
 	let { children }: LayoutProps = $props()
@@ -49,7 +54,7 @@
 {#if !ready}
 	<div
 		transition:fade={{ duration: 250 }}
-		class="fixed inset-0 z-[100] flex items-center justify-center bg-primary-600"
+		class="fixed inset-0 z-100 flex items-center justify-center bg-primary-600"
 	>
 		<LoaderCircle class="animate-spin text-white" size={32} />
 	</div>

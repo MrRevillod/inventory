@@ -17,8 +17,7 @@
 			"tab_size": 4,
 			"hard_tabs": true,
 			"code_actions_on_format": {
-				"source.fixAll.biome": true,
-				"source.organizeImports.biome": true
+				"source.fixAll.biome": true
 			}
 		},
 		"TypeScript": {
@@ -26,8 +25,7 @@
 			"tab_size": 4,
 			"hard_tabs": true,
 			"code_actions_on_format": {
-				"source.fixAll.biome": true,
-				"source.organizeImports.biome": true
+				"source.fixAll.biome": true
 			}
 		},
 		"TSX": {
@@ -35,8 +33,7 @@
 			"tab_size": 4,
 			"hard_tabs": true,
 			"code_actions_on_format": {
-				"source.fixAll.biome": true,
-				"source.organizeImports.biome": true
+				"source.fixAll.biome": true
 			}
 		},
 		"Svelte": {
@@ -44,8 +41,7 @@
 			"tab_size": 4,
 			"hard_tabs": true,
 			"code_actions_on_format": {
-				"source.fixAll.biome": true,
-				"source.organizeImports.biome": true
+				"source.fixAll.biome": true
 			}
 		},
 		"JSON": {
