@@ -6,7 +6,7 @@ import type { Handle } from "@sveltejs/kit/hooks"
 
 // Paths reachable without unlocking. `/pwa` and `/offline` are prerendered, so
 // in production Vercel serves them as static files and never reaches the hook.
-const PUBLIC_PATHS = ["/unlock", "/pwa", "/offline"]
+const PUBLIC_PATHS = ["/unlock", "/pwa", "/offline", "/health"]
 
 const PUBLIC_FILES = new Set(["/robots.txt", "/manifest.webmanifest", "/service-worker.js"])
 

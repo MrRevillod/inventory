@@ -9,12 +9,11 @@ import { PrismaClient } from "./generated/prisma/client"
 
 const adapter = new PrismaPg({
 	connectionString: DATABASE_URL,
-	// Fail fast instead of hanging a request when the pooler is slow or stuck.
-	// No `statement_timeout` here: it travels in the startup packet and the
-	// Prisma Postgres pooler rejects it ("Failed to connect to upstream
-	// database"). `query_timeout` is enforced client-side instead.
-	connectionTimeoutMillis: 10_000,
-	query_timeout: 15_000,
+	// No `query_timeout`: Prisma Postgres can take tens of seconds to answer the
+	// first query after idle, and killing it turned cold starts into 500s.
+	// Vercel's function budget is the real bound. `connectionTimeoutMillis`
+	// only guards against a genuinely unreachable host.
+	connectionTimeoutMillis: 30_000,
 })
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }

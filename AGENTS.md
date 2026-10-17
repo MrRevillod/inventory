@@ -91,6 +91,13 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
 - **Deployment Protection**: turn Vercel Authentication **off** (Settings →
   Deployment Protection) or phones can't reach the app; the PIN gate is what
   protects it instead.
+- **Cold starts**: Prisma Postgres can take tens of seconds to answer the first
+  query after idle, so the pg adapter sets **no `query_timeout`** — Vercel's
+  function budget is the bound (Fluid compute defaults to 300s). Never set
+  `statement_timeout`: it travels in the startup packet and the pooler rejects
+  it with "Failed to connect to upstream database". Point an external uptime
+  monitor at the public `/health` route every few minutes to keep the database
+  warm and avoid the cold path for real users.
 
 ## Auth (temporary PIN gate)
 
@@ -142,8 +149,9 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   products, keeping responsibilities separate.
 - Routes (`src/routes/*`) stay thin: `load` calls services, the page renders
   module components. Route paths are in English while UI text stays Spanish:
-  `/` (POS), `/inventory`, `/history`, `/settings`, `/pwa` (install) and
-  `/offline` (service worker fallback; `/pwa` and `/offline` are prerendered).
+  `/` (POS), `/inventory`, `/history`, `/settings`, `/pwa` (install),
+  `/offline` (service worker fallback; `/pwa` and `/offline` are prerendered)
+  and `/health` (database ping, public).
 - Client persistence goes through `LocalStorage`
   (`src/lib/shared/local-storage.ts`), a static-only class that does the JSON
   parse/stringify and no-ops on the server. Keys live in `STORAGE_KEYS`

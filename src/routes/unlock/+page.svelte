@@ -39,7 +39,20 @@
 			<Lock size={24} />
 		</span>
 
-		{#if !data.configured}
+		{#if data.dbError}
+			<h1 class="mt-4 text-lg font-extrabold tracking-tight">Sin conexión con la base</h1>
+			<p class="mt-2 max-w-xs text-center text-sm text-neutral-500">
+				No pudimos consultar la base de datos. A veces la primera carga tras un rato de inactividad
+				tarda; vuelve a intentarlo.
+			</p>
+			<button
+				type="button"
+				onclick={() => window.location.reload()}
+				class="mt-5 rounded-2xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
+			>
+				Reintentar
+			</button>
+		{:else if !data.configured}
 			<h1 class="mt-4 text-lg font-extrabold tracking-tight">App no inicializada</h1>
 			<p class="mt-2 max-w-xs text-center text-sm text-neutral-500">
 				Todavía no hay un PIN configurado. Corre

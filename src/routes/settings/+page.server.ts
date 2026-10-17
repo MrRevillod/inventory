@@ -39,7 +39,17 @@ export const actions: Actions = {
 			return fail(400, failed("changePin", { next: ["El PIN nuevo debe ser distinto"] }))
 		}
 
-		const changed = await authService.changePin(parsed.data.current, parsed.data.next)
+		let changed: boolean
+		try {
+			changed = await authService.changePin(parsed.data.current, parsed.data.next)
+		} catch (error) {
+			console.error("[settings] no se pudo cambiar el PIN:", error)
+			return fail(
+				503,
+				failed("changePin", { pin: ["No se pudo conectar con la base de datos"] }),
+			)
+		}
+
 		if (!changed) {
 			return fail(400, failed("changePin", { current: ["PIN actual incorrecto"] }))
 		}
