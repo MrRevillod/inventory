@@ -13,8 +13,9 @@ formerly the Expo app "NailApp").
   is no `legacy/` directory in the repo anymore.
 - Phases: data layer first, **auth (Better Auth) comes later**. There is no auth
   yet, so nothing is protected — do not deploy this publicly as-is.
-- Deploy target is Vercel, but `vite.config.ts` still uses `adapter-auto`. Switch
-  it to `@sveltejs/adapter-vercel` only when wiring up deployment.
+- Deploy target is **Vercel** (`@sveltejs/adapter-vercel` in `vite.config.ts`)
+  with a **Prisma Postgres** database. Server functions run on Node.js, not
+  Edge — `@prisma/adapter-pg` needs TCP. See `## Deploy` below.
 
 ## Commands
 
@@ -28,16 +29,25 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   - `pnpm db:dev` — start the local Prisma Postgres (`prisma dev`). Run detached
     with `pnpm prisma dev -d`; stop with `pnpm db:stop`.
   - `pnpm db:generate` — regenerate the Prisma client (see below)
-  - `pnpm db:migrate` (dev) · `pnpm db:deploy` (prod) · `pnpm db:seed` · `pnpm db:studio`
+  - `pnpm db:migrate` · `pnpm db:seed` · `pnpm db:studio` — local database
+    (`.env`, `prisma dev`).
+  - `pnpm db:deploy:prod` · `pnpm db:seed:prod` · `pnpm db:studio:prod` — hosted
+    Prisma Postgres, via `.env.production.local` (`dotenv run --file`).
 - `pnpm lint` (Biome check) · `pnpm lint:fix` (Biome check --write) ·
   `pnpm format` (Biome format --write). Biome uses tabs and double quotes
   (`biome.json`) and scans the repo (excluding generated output and
   `node_modules`). There is **no test runner** — do not invent `pnpm test`.
+- `pnpm pwa:assets` — regenerate the PWA icons in `static/` from
+  `static/logo.svg` (config in `pwa-assets.config.ts`).
 
 ## Local database
 
 - `.env` (gitignored) points at the local `prisma dev` Postgres on
   `localhost:51214`. Start from `.env.example`.
+- Production credentials live **only** in `.env.production.local` (gitignored),
+  used by the `pnpm db:*:prod` scripts. Never put a production URL in `.env`:
+  the Prisma CLI reads `.env`, so migrations would silently run against
+  production.
 - Fresh setup order: `pnpm install` → `pnpm db:dev` → `pnpm db:generate` →
   `pnpm db:migrate` → `pnpm db:seed`.
 - The generated Prisma client lives in `src/lib/shared/server/generated/prisma/`
@@ -50,6 +60,28 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   dev server** — the Prisma client singleton is cached on `globalThis`, so HMR
   won't pick up a regenerated client and Prisma throws `Unknown argument`. A
   fresh `pnpm dev` regenerates automatically.
+
+## Deploy (Vercel + Prisma Postgres)
+
+- **Hosting**: Vercel via `@sveltejs/adapter-vercel`. Functions must stay on the
+  Node.js runtime (never Edge) because `@prisma/adapter-pg` needs TCP. The build
+  command is the default `pnpm build`, which runs `prisma generate` first.
+- **Database**: Prisma Postgres. Create it in the Prisma console
+  (console.prisma.io) or with `pnpm dlx create-db@latest`, then copy the two
+  connection strings:
+  - **pooled** (`pooled.db.prisma.io`) → app runtime;
+  - **direct** (`db.prisma.io`) → Prisma CLI only (migrate, seed, Studio).
+  Migrations through the pooled host fail (PgBouncer transaction mode).
+- **Vercel env vars**: only `DATABASE_URL` (pooled), for Production and Preview.
+  `DIRECT_URL` is CLI-only: it stays in `.env.production.local` on your machine.
+- **First deploy**: put the direct URL in `.env.production.local`, then
+  `pnpm db:deploy:prod` and `pnpm db:seed:prod`. The seed uses fixed ids and is
+  **not** idempotent — run it once on an empty database.
+- **Schema changes**: `pnpm db:migrate` locally, commit the migration, then
+  `pnpm db:deploy:prod`. Never run `migrate dev` against production.
+  `pnpm db:studio:prod` inspects the hosted database.
+- **No auth yet**: a public deployment lets anyone read and modify inventory and
+  sales. Use throwaway data while testing.
 
 ## SvelteKit 3 quirks (they differ from most tutorials / SvelteKit 2)
 
@@ -82,7 +114,8 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   products, keeping responsibilities separate.
 - Routes (`src/routes/*`) stay thin: `load` calls services, the page renders
   module components. Route paths are in English while UI text stays Spanish:
-  `/` (POS), `/inventory`, `/history`, `/settings`.
+  `/` (POS), `/inventory`, `/history`, `/settings`, `/pwa` (install) and
+  `/offline` (service worker fallback; `/pwa` and `/offline` are prerendered).
 - Client persistence goes through `LocalStorage`
   (`src/lib/shared/local-storage.ts`), a static-only class that does the JSON
   parse/stringify and no-ops on the server. Keys live in `STORAGE_KEYS`
@@ -148,6 +181,29 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   change every corner at runtime.
 - Sale celebration: `confetti.fire()` (`src/lib/shared/confetti.svelte.ts`) drives
   `Confetti.svelte` — a dependency-free CSS burst, skipped under reduced motion.
+
+## PWA
+
+- Installable app built on the **native SvelteKit 3 service worker**
+  (`src/service-worker/index.ts`); no `@vite-pwa/*` plugin — its SvelteKit peer
+  dependency only covers 1.x/2.x.
+- `static/manifest.webmanifest` plus the icons in `static/`, generated from
+  `static/logo.svg` with `pnpm pwa:assets`. `src/app.html` links the manifest,
+  the favicon and the apple-touch icon; the icon and head links are the only
+  reason to touch `app.html` for the PWA.
+- The service worker precaches `immutable` + `assets` + `prerendered`
+  (cache-first for those), is **network-first for navigations** with the
+  prerendered `/offline` page as fallback, and **network-only for everything
+  else** — a POS must never serve stale sales or inventory.
+- `/pwa` is the install screen: `beforeinstallprompt` on Chromium, manual
+  "Añadir a pantalla de inicio" steps on iOS; it is linked from `/settings`.
+  `/offline` is the offline fallback. Both are prerendered via
+  `prerender.entries` in `vite.config.ts` with `crawl: false`, so the
+  database-backed routes (`/`, `/inventory`, `/history`) are never prerendered.
+- The service worker is only built and registered for production: test with
+  `pnpm build && pnpm preview`, **not** `pnpm dev`. `src/service-worker` is
+  excluded from the root `tsconfig.json` and ships its own `tsconfig.json`
+  extending `$app/tsconfig/service-worker`.
 
 ## Domain
 

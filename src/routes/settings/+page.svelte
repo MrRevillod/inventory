@@ -5,6 +5,8 @@
 	import Settings from "@lucide/svelte/icons/settings"
 	import Squircle from "@lucide/svelte/icons/squircle"
 	import RotateCcw from "@lucide/svelte/icons/rotate-ccw"
+	import Smartphone from "@lucide/svelte/icons/smartphone"
+	import ChevronRight from "@lucide/svelte/icons/chevron-right"
 
 	import PageHeader from "#lib/shared/components/PageHeader.svelte"
 
@@ -124,6 +126,22 @@
 			Cambia el redondeo de tarjetas, botones y píldoras en toda la app.
 		</p>
 	</section>
+
+	<a
+		href="/pwa"
+		class="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-neutral-200/70 transition-colors active:bg-neutral-100"
+	>
+		<span
+			class="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-primary-600 text-white"
+		>
+			<Smartphone size={18} />
+		</span>
+		<span class="min-w-0 flex-1">
+			<span class="block font-bold">Instalar app</span>
+			<span class="block text-xs text-neutral-400">Añádela a tu pantalla de inicio</span>
+		</span>
+		<ChevronRight size={18} class="shrink-0 text-neutral-300" />
+	</a>
 
 	<button
 		type="button"

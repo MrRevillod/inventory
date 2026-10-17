@@ -4,7 +4,6 @@
 	import LoaderCircle from "@lucide/svelte/icons/loader-circle"
 
 	import Toasts from "#lib/shared/components/Toasts.svelte"
-	import favicon from "#lib/assets/favicon.svg"
 	import Confetti from "#lib/shared/components/Confetti.svelte"
 	import BottomNav from "#lib/shared/components/BottomNav.svelte"
 
@@ -39,10 +38,6 @@
 		})
 	})
 </script>
-
-<svelte:head>
-	<link rel="icon" href={favicon}>
-</svelte:head>
 
 <div class="mx-auto min-h-dvh max-w-md overflow-x-clip bg-neutral-100">
 	{@render children()}
