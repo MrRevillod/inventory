@@ -11,8 +11,9 @@ formerly the Expo app "NailApp").
   (`"type": "module"`).
 - The port from the old Expo / React Native app ("NailApp") is **complete**; there
   is no `legacy/` directory in the repo anymore.
-- Phases: data layer first, **auth (Better Auth) comes later**. There is no auth
-  yet, so nothing is protected — do not deploy this publicly as-is.
+- Phases: data layer first, **real auth (Better Auth) comes later**. Until then a
+  single shared PIN gate protects the app (`## Auth` below) — it is a stopgap,
+  not authentication.
 - Deploy target is **Vercel** (`@sveltejs/adapter-vercel` in `vite.config.ts`)
   with a **Prisma Postgres** database. Server functions run on Node.js, not
   Edge — `@prisma/adapter-pg` needs TCP. See `## Deploy` below.
@@ -33,6 +34,8 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
     (`.env`, `prisma dev`).
   - `pnpm db:deploy:prod` · `pnpm db:seed:prod` · `pnpm db:studio:prod` — hosted
     Prisma Postgres, via `.env.production.local` (`dotenv run --file`).
+  - `pnpm pin:set` / `pnpm pin:set:prod` — set or rotate the global unlock PIN
+    (local / hosted). The app is blocked until this runs.
 - `pnpm lint` (Biome check) · `pnpm lint:fix` (Biome check --write) ·
   `pnpm format` (Biome format --write). Biome uses tabs and double quotes
   (`biome.json`) and scans the repo (excluding generated output and
@@ -49,7 +52,10 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   the Prisma CLI reads `.env`, so migrations would silently run against
   production.
 - Fresh setup order: `pnpm install` → `pnpm db:dev` → `pnpm db:generate` →
-  `pnpm db:migrate` → `pnpm db:seed`.
+  `pnpm db:migrate` → `pnpm db:seed` → `pnpm pin:set`.
+- `SESSION_SECRET` (in `.env`, `.env.example` and Vercel) signs the unlock
+  cookie. It is validated: a missing or short value **fails the build** on
+  purpose, because the auth hook runs on every request.
 - The generated Prisma client lives in `src/lib/shared/server/generated/prisma/`
   and is **gitignored** (run `pnpm db:generate` after cloning). Import it from
   `.../generated/prisma/client`. Use the singleton in
@@ -72,16 +78,38 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   - **pooled** (`pooled.db.prisma.io`) → app runtime;
   - **direct** (`db.prisma.io`) → Prisma CLI only (migrate, seed, Studio).
   Migrations through the pooled host fail (PgBouncer transaction mode).
-- **Vercel env vars**: only `DATABASE_URL` (pooled), for Production and Preview.
-  `DIRECT_URL` is CLI-only: it stays in `.env.production.local` on your machine.
+- **Vercel env vars**: `DATABASE_URL` (pooled) and `SESSION_SECRET`, both for
+  Production, Preview **and** Development — `prisma generate` loads
+  `prisma.config.ts` during the build, and `SESSION_SECRET` is validated at build
+  time. `DIRECT_URL` is CLI-only: it stays in `.env.production.local`.
 - **First deploy**: put the direct URL in `.env.production.local`, then
-  `pnpm db:deploy:prod` and `pnpm db:seed:prod`. The seed uses fixed ids and is
-  **not** idempotent — run it once on an empty database.
+  `pnpm db:deploy:prod`, `pnpm db:seed:prod` and `pnpm pin:set:prod`. The seed
+  uses fixed ids and is **not** idempotent — run it once on an empty database.
 - **Schema changes**: `pnpm db:migrate` locally, commit the migration, then
   `pnpm db:deploy:prod`. Never run `migrate dev` against production.
   `pnpm db:studio:prod` inspects the hosted database.
-- **No auth yet**: a public deployment lets anyone read and modify inventory and
-  sales. Use throwaway data while testing.
+- **Deployment Protection**: turn Vercel Authentication **off** (Settings →
+  Deployment Protection) or phones can't reach the app; the PIN gate is what
+  protects it instead.
+
+## Auth (temporary PIN gate)
+
+- Single shared 8-digit PIN, no users, no audit trail. It is a **stopgap** until
+  Better Auth lands, and it all lives behind `src/lib/auth/` so it can be
+  removed cleanly.
+- `AppConfig` (schema.prisma) is a single row: `pinHash`, `pinSalt`, `attempts`,
+  `lockedAt`. Only an scrypt hash is stored, and it is **never** returned to the
+  client — the row is read in `hooks.server.ts` / actions only. Set or rotate it
+  with `pnpm pin:set` (`--pin` for non-interactive); never through the seed.
+- `hooks.server.ts` gates everything except `/unlock`, the static assets and the
+  prerendered `/pwa` + `/offline`. It validates a signed cookie
+  (`src/lib/auth/session.ts`, HMAC with `SESSION_SECRET`) and touches **no
+  database**; GETs are redirected to `/unlock`, other methods get a 401.
+- If no PIN is configured the app is blocked ("app no inicializada") — the
+  `/unlock` load reports it. 5 failed attempts lock it for 5 minutes.
+- `/settings` changes the PIN (verifying the current one) and logs out. Changing
+  the PIN clears the cookie **on that device only** — other sessions stay valid
+  until they expire (30 days).
 
 ## SvelteKit 3 quirks (they differ from most tutorials / SvelteKit 2)
 

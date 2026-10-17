@@ -21,6 +21,8 @@
 		"db:studio": "prisma studio",
 		"db:dev": "prisma dev",
 		"db:stop": "prisma dev stop default",
+		"pin:set": "tsx prisma/set-pin.ts",
+		"pin:set:prod": "dotenv run --file .env.production.local -- tsx prisma/set-pin.ts",
 		"db:deploy:prod": "dotenv run --file .env.production.local -- prisma migrate deploy",
 		"db:seed:prod": "dotenv run --file .env.production.local -- prisma db seed",
 		"db:studio:prod": "dotenv run --file .env.production.local -- prisma studio"

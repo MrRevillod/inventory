@@ -1,6 +1,8 @@
 <script lang="ts">
+	import Lock from "@lucide/svelte/icons/lock"
 	import Type from "@lucide/svelte/icons/type"
 	import Store from "@lucide/svelte/icons/store"
+	import LogOut from "@lucide/svelte/icons/log-out"
 	import Palette from "@lucide/svelte/icons/palette"
 	import Settings from "@lucide/svelte/icons/settings"
 	import Squircle from "@lucide/svelte/icons/squircle"
@@ -10,6 +12,9 @@
 
 	import PageHeader from "#lib/shared/components/PageHeader.svelte"
 
+	import { enhance } from "$app/forms"
+
+	import { formHandler } from "#lib/shared/form"
 	import { ACCENT_PRESETS } from "#lib/settings/palette"
 	import { type RadiusProfile, settings, type UiScale } from "#lib/settings/settings.svelte"
 
@@ -125,6 +130,85 @@
 		<p class="mt-3 text-xs text-neutral-400">
 			Cambia el redondeo de tarjetas, botones y píldoras en toda la app.
 		</p>
+	</section>
+
+	<section class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-neutral-200/70">
+		<h2 class="flex items-center gap-2 font-bold">
+			<Lock size={17} class="text-primary-600" />
+			Seguridad
+		</h2>
+
+		<form
+			method="POST"
+			action="?/changePin"
+			use:enhance={formHandler(() => {}, "PIN actualizado")}
+			class="mt-3 space-y-3"
+		>
+			<label class="block">
+				<span class="mb-1.5 block text-sm font-semibold text-neutral-700">PIN actual</span>
+				<input
+					name="current"
+					type="password"
+					inputmode="numeric"
+					maxlength="8"
+					pattern="[0-9]{8}"
+					autocomplete="current-password"
+					required
+					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+				>
+			</label>
+			<label class="block">
+				<span class="mb-1.5 block text-sm font-semibold text-neutral-700">PIN nuevo</span>
+				<input
+					name="next"
+					type="password"
+					inputmode="numeric"
+					maxlength="8"
+					pattern="[0-9]{8}"
+					autocomplete="new-password"
+					required
+					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+				>
+			</label>
+			<label class="block">
+				<span class="mb-1.5 block text-sm font-semibold text-neutral-700">
+					Repite el PIN nuevo
+				</span>
+				<input
+					name="confirm"
+					type="password"
+					inputmode="numeric"
+					maxlength="8"
+					pattern="[0-9]{8}"
+					autocomplete="new-password"
+					required
+					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+				>
+			</label>
+
+			<button
+				type="submit"
+				class="w-full rounded-2xl bg-primary-600 py-3.5 text-sm font-semibold text-white shadow-sm transition-transform active:scale-[0.98]"
+			>
+				Cambiar PIN
+			</button>
+			<p class="text-xs text-neutral-400">Al cambiarlo tendrás que desbloquear de nuevo.</p>
+		</form>
+
+		<form
+			method="POST"
+			action="?/logout"
+			use:enhance={formHandler(() => {}, "Sesión cerrada")}
+			class="mt-4"
+		>
+			<button
+				type="submit"
+				class="flex w-full items-center justify-center gap-2 rounded-2xl border border-neutral-200 py-3.5 text-sm font-semibold text-neutral-600 transition-colors active:bg-neutral-100"
+			>
+				<LogOut size={16} />
+				Cerrar sesión
+			</button>
+		</form>
 	</section>
 
 	<a

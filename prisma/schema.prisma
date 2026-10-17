@@ -73,3 +73,15 @@ model SaleItem {
   @@index([saleId])
   @@index([productId])
 }
+
+// Single-row gate config holding the temporary global PIN. Only a scrypt hash
+// and its salt are stored — never the plaintext. Managed with `pnpm pin:set`.
+// This is a stopgap; real auth (Better Auth) comes later.
+model AppConfig {
+  id        String    @id @default("app")
+  pinHash   String
+  pinSalt   String
+  attempts  Int       @default(0)
+  lockedAt  DateTime?
+  updatedAt DateTime  @updatedAt
+}

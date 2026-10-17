@@ -7,7 +7,12 @@ import { DATABASE_URL } from "$app/env/private"
 
 import { PrismaClient } from "./generated/prisma/client"
 
-const adapter = new PrismaPg({ connectionString: DATABASE_URL })
+const adapter = new PrismaPg({
+	connectionString: DATABASE_URL,
+	// Fail fast instead of hanging a request when the pooler is slow or stuck.
+	connectionTimeoutMillis: 10_000,
+	statement_timeout: 15_000,
+})
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
