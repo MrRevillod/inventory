@@ -95,7 +95,7 @@
 				bind:value={search}
 				aria-label="Buscar producto"
 				placeholder="Buscar producto"
-				class="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
+				class="w-full bg-transparent outline-none placeholder:text-neutral-400"
 			>
 			{#if search}
 				<button

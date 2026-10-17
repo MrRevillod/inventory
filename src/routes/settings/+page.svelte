@@ -46,7 +46,7 @@
 				oninput={(event) => settings.patch({ storeName: event.currentTarget.value })}
 				maxlength="40"
 				placeholder="inventory"
-				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 			>
 		</label>
 	</section>
@@ -154,7 +154,7 @@
 					maxlength="8"
 					autocomplete="off"
 					required
-					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 				>
 			</label>
 			<label class="block">
@@ -166,7 +166,7 @@
 					maxlength="8"
 					autocomplete="off"
 					required
-					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 				>
 			</label>
 			<label class="block">
@@ -180,7 +180,7 @@
 					maxlength="8"
 					autocomplete="off"
 					required
-					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+					class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 tracking-[0.3em] outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 				>
 			</label>
 

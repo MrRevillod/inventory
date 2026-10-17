@@ -54,7 +54,7 @@
 				required
 				maxlength="100"
 				placeholder="Nombre del producto"
-				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 			>
 		</label>
 		<label class="block">
@@ -67,7 +67,7 @@
 				required
 				bind:value={price}
 				placeholder="10000"
-				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 			>
 		</label>
 		<label class="block">
@@ -75,7 +75,7 @@
 			<select
 				name="subcategoryId"
 				bind:value={subcategoryId}
-				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
+				class="w-full rounded-xl bg-neutral-100 px-3.5 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-primary-300"
 			>
 				{#each options as group (group.category)}
 					<optgroup label={group.category}>

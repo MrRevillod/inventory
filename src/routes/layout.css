@@ -58,6 +58,17 @@
 	body {
 		@apply font-sans text-neutral-900 antialiased;
 	}
+	/*
+	 * iOS Safari zooms the page when a focused field's font-size is below 16px,
+	 * so form controls get a floor. Never put a `text-sm`-style utility on a
+	 * field: it would go under the floor and bring the zoom back. Using `rem`
+	 * lets the "Tamaño de la interfaz" setting still scale them up.
+	 */
+	input,
+	select,
+	textarea {
+		font-size: max(16px, 1rem);
+	}
 }
 
 ::view-transition-old(root) {
