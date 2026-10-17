@@ -9,16 +9,12 @@ formerly the Expo app "NailApp").
   (Prisma Postgres), with Lucide icons (`@lucide/svelte`) and auto-animate
   (`@formkit/auto-animate`). Package manager is pnpm; the project is ESM
   (`"type": "module"`).
-- `legacy/` is the previous Expo / React Native app. Treat it as the **reference
-  source to port domain logic and UI from**. Do not import from it, build it, or
-  run its scripts. It has its own `package.json`, `node_modules`, tsconfig, and
-  `@/` alias (mapped to the `legacy/` root — not the project alias).
+- The port from the old Expo / React Native app ("NailApp") is **complete**; there
+  is no `legacy/` directory in the repo anymore.
 - Phases: data layer first, **auth (Better Auth) comes later**. There is no auth
   yet, so nothing is protected — do not deploy this publicly as-is.
 - Deploy target is Vercel, but `vite.config.ts` still uses `adapter-auto`. Switch
   it to `@sveltejs/adapter-vercel` only when wiring up deployment.
-- `git status` shows the old app's files as deleted and `legacy/` as untracked.
-  That is the intended migration state.
 
 ## Commands
 
@@ -35,8 +31,8 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   - `pnpm db:migrate` (dev) · `pnpm db:deploy` (prod) · `pnpm db:seed` · `pnpm db:studio`
 - `pnpm lint` (Biome check) · `pnpm lint:fix` (Biome check --write) ·
   `pnpm format` (Biome format --write). Biome uses tabs and double quotes
-  (`biome.json`) and scans everything except `legacy/`. There is **no test
-  runner** — do not invent `pnpm test`.
+  (`biome.json`) and scans the repo (excluding generated output and
+  `node_modules`). There is **no test runner** — do not invent `pnpm test`.
 
 ## Local database
 
@@ -160,8 +156,8 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
 - Data model (`prisma/schema.prisma`): `Category` → `Subcategory` (with `icon` +
   `tone`) → `Product` → `SaleItem`. Only subcategories carry `tone` (color derived
   from the accent). `SaleItem` snapshots `name` and `price` so sales history stays
-  correct even if a product is renamed, re-priced, or deleted. Seed data is ported
-  from `legacy/lib/db.ts`.
+  correct even if a product is renamed, re-priced, or deleted. Seed data lives in
+  `prisma/seed.ts`.
 - Deletes are **soft**: `deletedAt` on `Category`/`Subcategory`/`Product`. Deleting
   a category/subcategory archives its children too; queries filter
   `deletedAt: null` and archived products can't be sold. Sales history is never
