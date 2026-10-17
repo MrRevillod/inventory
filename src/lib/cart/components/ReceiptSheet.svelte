@@ -84,7 +84,7 @@
 				>
 			{:else}
 				<div
-					class="flex aspect-[3/4] w-full items-center justify-center rounded-2xl bg-neutral-100 text-sm text-neutral-400"
+					class="flex aspect-3/4 w-full items-center justify-center rounded-2xl bg-neutral-100 text-sm text-neutral-400"
 				>
 					{#if drawing}
 						Generando imagen…

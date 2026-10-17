@@ -134,7 +134,6 @@ export async function renderReceipt(data: ReceiptData): Promise<Blob> {
 	setFont(ctx, 400, 20)
 	ctx.fillStyle = MUTED
 	ctx.textAlign = "center"
-	ctx.fillText("¡Gracias por tu compra!", WIDTH / 2, footerY)
 	ctx.textAlign = "left"
 
 	return await new Promise<Blob>((resolve, reject) => {
