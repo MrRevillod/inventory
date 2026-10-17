@@ -1,9 +1,9 @@
 class ConfettiStore {
-	burst = $state(0);
+	burst = $state(0)
 
 	fire() {
-		this.burst += 1;
+		this.burst += 1
 	}
 }
 
-export const confetti = new ConfettiStore();
+export const confetti = new ConfettiStore()

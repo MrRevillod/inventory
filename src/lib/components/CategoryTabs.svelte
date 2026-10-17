@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Layers from "@lucide/svelte/icons/layers";
-	import CategoryIcon from "./CategoryIcon.svelte";
+	import Layers from "@lucide/svelte/icons/layers"
+	import CategoryIcon from "./CategoryIcon.svelte"
 
 	let {
 		items,
@@ -8,38 +8,38 @@
 		onselect,
 		onmanage,
 	}: {
-		items: { id: string; name: string; icon: string }[];
-		active: string | null;
-		onselect: (id: string) => void;
-		onmanage?: () => void;
-	} = $props();
+		items: { id: string; name: string; icon: string }[]
+		active: string | null
+		onselect: (id: string) => void
+		onmanage?: () => void
+	} = $props()
 
-	let scroller = $state<HTMLDivElement | null>(null);
-	let overflow = $state(false);
-	let atEnd = $state(true);
+	let scroller = $state<HTMLDivElement | null>(null)
+	let overflow = $state(false)
+	let atEnd = $state(true)
 
-	const showEndFade = $derived(overflow && !atEnd);
+	const showEndFade = $derived(overflow && !atEnd)
 
 	function measure() {
-		if (!scroller) return;
-		overflow = scroller.scrollWidth > scroller.clientWidth + 1;
-		atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 2;
+		if (!scroller) return
+		overflow = scroller.scrollWidth > scroller.clientWidth + 1
+		atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 2
 	}
 
 	/** Svelte action: runs on mount, when the node and its layout exist. */
 	function observe(node: HTMLDivElement) {
-		scroller = node;
-		measure();
-		const resize = new ResizeObserver(measure);
-		resize.observe(node);
-		const mutation = new MutationObserver(measure);
-		mutation.observe(node, { childList: true });
+		scroller = node
+		measure()
+		const resize = new ResizeObserver(measure)
+		resize.observe(node)
+		const mutation = new MutationObserver(measure)
+		mutation.observe(node, { childList: true })
 		return {
 			destroy() {
-				resize.disconnect();
-				mutation.disconnect();
+				resize.disconnect()
+				mutation.disconnect()
 			},
-		};
+		}
 	}
 </script>
 

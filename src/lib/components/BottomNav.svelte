@@ -1,20 +1,20 @@
 <script lang="ts">
-	import History from "@lucide/svelte/icons/history";
-	import Package from "@lucide/svelte/icons/package";
-	import Settings from "@lucide/svelte/icons/settings";
-	import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
-	import { cart } from "#lib/cart.svelte";
-	import { page } from "$app/state";
+	import History from "@lucide/svelte/icons/history"
+	import Package from "@lucide/svelte/icons/package"
+	import Settings from "@lucide/svelte/icons/settings"
+	import ShoppingCart from "@lucide/svelte/icons/shopping-cart"
+	import { cart } from "#lib/cart.svelte"
+	import { page } from "$app/state"
 
 	const links = [
 		{ href: "/", label: "Vender", icon: ShoppingCart },
 		{ href: "/inventario", label: "Inventario", icon: Package },
 		{ href: "/historial", label: "Historial", icon: History },
 		{ href: "/ajustes", label: "Ajustes", icon: Settings },
-	];
+	]
 
 	const isActive = (href: string) =>
-		href === "/" ? page.url.pathname === "/" : page.url.pathname.startsWith(href);
+		href === "/" ? page.url.pathname === "/" : page.url.pathname.startsWith(href)
 </script>
 
 <nav

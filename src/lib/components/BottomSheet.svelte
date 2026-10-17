@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
-	import { fade, fly } from "svelte/transition";
+	import type { Snippet } from "svelte"
+	import { fade, fly } from "svelte/transition"
 
 	let {
 		open = false,
@@ -8,21 +8,21 @@
 		onclose,
 		children,
 	}: {
-		open?: boolean;
-		title?: string;
-		onclose: () => void;
-		children: Snippet;
-	} = $props();
+		open?: boolean
+		title?: string
+		onclose: () => void
+		children: Snippet
+	} = $props()
 
 	// Lock background scroll while the sheet is open.
 	$effect(() => {
-		if (!open) return;
-		const previous = document.body.style.overflow;
-		document.body.style.overflow = "hidden";
+		if (!open) return
+		const previous = document.body.style.overflow
+		document.body.style.overflow = "hidden"
 		return () => {
-			document.body.style.overflow = previous;
-		};
-	});
+			document.body.style.overflow = previous
+		}
+	})
 </script>
 
 <svelte:window onkeydown={(event) => event.key === "Escape" && open && onclose()} />

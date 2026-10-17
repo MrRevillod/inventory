@@ -19,7 +19,6 @@
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab",
-		"indentWidth": 4,
 		"lineWidth": 100
 	},
 	"linter": {
@@ -33,7 +32,10 @@
 			"unsafeParameterDecoratorsEnabled": true
 		},
 		"formatter": {
-			"quoteStyle": "double"
+			"quoteStyle": "double",
+			"indentStyle": "tab",
+			"indentWidth": 4,
+			"semicolons": "asNeeded"
 		}
 	},
 	"json": {

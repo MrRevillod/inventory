@@ -5,6 +5,6 @@ const dateTime = new Intl.DateTimeFormat("es-CL", {
 	hour: "2-digit",
 	minute: "2-digit",
 	hour12: false,
-});
+})
 
-export const formatDateTime = (date: Date | string) => dateTime.format(new Date(date));
+export const formatDateTime = (date: Date | string) => dateTime.format(new Date(date))

@@ -1,25 +1,25 @@
 <script lang="ts">
-	import Palette from "@lucide/svelte/icons/palette";
-	import RotateCcw from "@lucide/svelte/icons/rotate-ccw";
-	import Settings from "@lucide/svelte/icons/settings";
-	import Squircle from "@lucide/svelte/icons/squircle";
-	import Store from "@lucide/svelte/icons/store";
-	import Type from "@lucide/svelte/icons/type";
-	import PageHeader from "#lib/components/PageHeader.svelte";
-	import { ACCENT_PRESETS } from "#lib/palette";
-	import { type RadiusProfile, settings, type UiScale } from "#lib/settings.svelte";
+	import Palette from "@lucide/svelte/icons/palette"
+	import RotateCcw from "@lucide/svelte/icons/rotate-ccw"
+	import Settings from "@lucide/svelte/icons/settings"
+	import Squircle from "@lucide/svelte/icons/squircle"
+	import Store from "@lucide/svelte/icons/store"
+	import Type from "@lucide/svelte/icons/type"
+	import PageHeader from "#lib/components/PageHeader.svelte"
+	import { ACCENT_PRESETS } from "#lib/palette"
+	import { type RadiusProfile, settings, type UiScale } from "#lib/settings.svelte"
 
 	const scaleOptions: { value: UiScale; label: string }[] = [
 		{ value: "compact", label: "Compacto" },
 		{ value: "normal", label: "Normal" },
 		{ value: "large", label: "Grande" },
-	];
+	]
 
 	const radiusOptions: { value: RadiusProfile; label: string }[] = [
 		{ value: "round", label: "Redondeado" },
 		{ value: "medium", label: "Intermedio" },
 		{ value: "square", label: "Recto" },
-	];
+	]
 </script>
 
 <PageHeader title="Ajustes" subtitle="Personaliza tu app" icon={Settings} />
@@ -31,9 +31,7 @@
 			Identidad
 		</h2>
 		<label class="mt-3 block">
-			<span class="mb-1.5 block text-sm font-semibold text-neutral-700"
-				>Nombre de la tienda</span
-			>
+			<span class="mb-1.5 block text-sm font-semibold text-neutral-700">Nombre de la tienda</span>
 			<input
 				value={settings.value.storeName}
 				oninput={(event) => settings.patch({ storeName: event.currentTarget.value })}
@@ -55,8 +53,8 @@
 					type="button"
 					onclick={() => settings.patch({ accent: preset })}
 					aria-label={preset}
-					class="size-9 rounded-pill ring-2 ring-offset-2 transition {settings.value
-						.accent === preset
+					class="size-9 rounded-pill ring-2 ring-offset-2 transition {settings.value.accent ===
+					preset
 						? "ring-neutral-800"
 						: "ring-transparent"}"
 					style="background: {preset}"
@@ -90,8 +88,8 @@
 				<button
 					type="button"
 					onclick={() => settings.patch({ uiScale: option.value })}
-					class="rounded-xl py-2 text-sm font-semibold transition-colors {settings.value
-						.uiScale === option.value
+					class="rounded-xl py-2 text-sm font-semibold transition-colors {settings.value.uiScale ===
+					option.value
 						? "bg-white text-primary-600 shadow-sm"
 						: "text-neutral-500"}"
 				>
@@ -111,8 +109,8 @@
 				<button
 					type="button"
 					onclick={() => settings.patch({ radius: option.value })}
-					class="rounded-xl py-2 text-sm font-semibold transition-colors {settings.value
-						.radius === option.value
+					class="rounded-xl py-2 text-sm font-semibold transition-colors {settings.value.radius ===
+					option.value
 						? "bg-white text-primary-600 shadow-sm"
 						: "text-neutral-500"}"
 				>

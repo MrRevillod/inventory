@@ -1,38 +1,38 @@
 <script lang="ts">
-	import LoaderCircle from "@lucide/svelte/icons/loader-circle";
-	import { fade } from "svelte/transition";
-	import { cart } from "#lib/cart.svelte";
-	import BottomNav from "#lib/components/BottomNav.svelte";
-	import Confetti from "#lib/components/Confetti.svelte";
-	import Toasts from "#lib/components/Toasts.svelte";
-	import { settings } from "#lib/settings.svelte";
-	import { onNavigate } from "$app/navigation";
-	import "./layout.css";
-	import favicon from "#lib/assets/favicon.svg";
-	import type { LayoutProps } from "./$types";
+	import LoaderCircle from "@lucide/svelte/icons/loader-circle"
+	import { fade } from "svelte/transition"
+	import { cart } from "#lib/cart.svelte"
+	import BottomNav from "#lib/components/BottomNav.svelte"
+	import Confetti from "#lib/components/Confetti.svelte"
+	import Toasts from "#lib/components/Toasts.svelte"
+	import { settings } from "#lib/settings.svelte"
+	import { onNavigate } from "$app/navigation"
+	import "./layout.css"
+	import favicon from "#lib/assets/favicon.svg"
+	import type { LayoutProps } from "./$types"
 
-	let { children }: LayoutProps = $props();
+	let { children }: LayoutProps = $props()
 
-	let ready = $state(false);
+	let ready = $state(false)
 
 	$effect(() => {
-		cart.hydrate();
-		settings.hydrate();
+		cart.hydrate()
+		settings.hydrate()
 		// Keep the splash for at least ~0.5s from page load so it doesn't flicker.
-		const timer = setTimeout(() => (ready = true), Math.max(0, 500 - performance.now()));
-		return () => clearTimeout(timer);
-	});
+		const timer = setTimeout(() => (ready = true), Math.max(0, 500 - performance.now()))
+		return () => clearTimeout(timer)
+	})
 
 	onNavigate((navigation) => {
-		if (!document.startViewTransition) return;
+		if (!document.startViewTransition) return
 
 		return new Promise((resolve) => {
 			document.startViewTransition(async () => {
-				resolve();
-				await navigation.complete;
-			});
-		});
-	});
+				resolve()
+				await navigation.complete
+			})
+		})
+	})
 </script>
 
 <svelte:head>

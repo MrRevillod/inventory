@@ -1,5 +1,5 @@
-import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
+import "dotenv/config"
+import { defineConfig, env } from "prisma/config"
 
 export default defineConfig({
 	schema: "prisma/schema.prisma",
@@ -14,4 +14,4 @@ export default defineConfig({
 		// Only used by `prisma migrate dev`; unused by `migrate deploy`.
 		shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
 	},
-});
+})

@@ -1,46 +1,46 @@
 <script lang="ts">
-	import Calendar from "@lucide/svelte/icons/calendar";
-	import ChevronDown from "@lucide/svelte/icons/chevron-down";
-	import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-	import ChevronRight from "@lucide/svelte/icons/chevron-right";
-	import History from "@lucide/svelte/icons/history";
-	import Receipt from "@lucide/svelte/icons/receipt";
-	import { slide } from "svelte/transition";
-	import PageHeader from "#lib/components/PageHeader.svelte";
-	import { formatDateTime } from "#lib/date";
-	import { formatCLP } from "#lib/money";
-	import { dayHeading, dayKey, monthKey, monthLabel, monthNav, PERIODS } from "#lib/period";
-	import type { PageProps } from "./$types";
+	import Calendar from "@lucide/svelte/icons/calendar"
+	import ChevronDown from "@lucide/svelte/icons/chevron-down"
+	import ChevronLeft from "@lucide/svelte/icons/chevron-left"
+	import ChevronRight from "@lucide/svelte/icons/chevron-right"
+	import History from "@lucide/svelte/icons/history"
+	import Receipt from "@lucide/svelte/icons/receipt"
+	import { slide } from "svelte/transition"
+	import PageHeader from "#lib/components/PageHeader.svelte"
+	import { formatDateTime } from "#lib/date"
+	import { formatCLP } from "#lib/money"
+	import { dayHeading, dayKey, monthKey, monthLabel, monthNav, PERIODS } from "#lib/period"
+	import type { PageProps } from "./$types"
 
-	let { data }: PageProps = $props();
+	let { data }: PageProps = $props()
 
-	let openId = $state<string | null>(null);
+	let openId = $state<string | null>(null)
 
 	const toggle = (id: string) => {
-		openId = openId === id ? null : id;
-	};
+		openId = openId === id ? null : id
+	}
 
-	const prev = $derived(monthNav(data.year, data.month, -1));
-	const next = $derived(monthNav(data.year, data.month, 1));
+	const prev = $derived(monthNav(data.year, data.month, -1))
+	const next = $derived(monthNav(data.year, data.month, 1))
 
 	const groups = $derived.by(() => {
 		const map = new Map<
 			string,
 			{ key: string; heading: string; total: number; count: number; sales: typeof data.sales }
-		>();
+		>()
 		for (const sale of data.sales) {
-			const key = dayKey(sale.createdAt);
-			let group = map.get(key);
+			const key = dayKey(sale.createdAt)
+			let group = map.get(key)
 			if (!group) {
-				group = { key, heading: dayHeading(sale.createdAt), total: 0, count: 0, sales: [] };
-				map.set(key, group);
+				group = { key, heading: dayHeading(sale.createdAt), total: 0, count: 0, sales: [] }
+				map.set(key, group)
 			}
-			group.total += sale.total;
-			group.count += 1;
-			group.sales.push(sale);
+			group.total += sale.total
+			group.count += 1
+			group.sales.push(sale)
 		}
-		return [...map.values()];
-	});
+		return [...map.values()]
+	})
 </script>
 
 <PageHeader title="Historial" subtitle="Ventas registradas" icon={History} />
@@ -146,9 +146,7 @@
 								class="divide-y divide-neutral-100 border-t border-neutral-100 px-4"
 							>
 								{#each sale.items as item (item.id)}
-									<li
-										class="flex items-center justify-between gap-3 py-2.5 text-sm"
-									>
+									<li class="flex items-center justify-between gap-3 py-2.5 text-sm">
 										<span class="flex-1">{item.name}</span>
 										<span class="text-neutral-400 tabular-nums">
 											{item.quantity}× {formatCLP(item.price)}

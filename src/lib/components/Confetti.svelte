@@ -1,28 +1,28 @@
 <script lang="ts">
-	import { confetti } from "#lib/confetti.svelte";
-	import { settings } from "#lib/settings.svelte";
-	import { browser } from "$app/env";
+	import { confetti } from "#lib/confetti.svelte"
+	import { settings } from "#lib/settings.svelte"
+	import { browser } from "$app/env"
 
 	interface Particle {
-		id: number;
-		x: number;
-		drift: number;
-		delay: number;
-		color: string;
-		size: number;
-		rotate: number;
+		id: number
+		x: number
+		drift: number
+		delay: number
+		color: string
+		size: number
+		rotate: number
 	}
 
-	let particles = $state<Particle[]>([]);
-	let nextId = 0;
-	let timer: ReturnType<typeof setTimeout> | undefined;
+	let particles = $state<Particle[]>([])
+	let nextId = 0
+	let timer: ReturnType<typeof setTimeout> | undefined
 
 	$effect(() => {
-		const burst = confetti.burst;
-		if (!browser || burst === 0) return;
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+		const burst = confetti.burst
+		if (!browser || burst === 0) return
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
-		const palette = [settings.value.accent, "#fbbf24", "#f472b6", "#34d399", "#60a5fa"];
+		const palette = [settings.value.accent, "#fbbf24", "#f472b6", "#34d399", "#60a5fa"]
 
 		particles = Array.from({ length: 28 }, () => ({
 			id: nextId++,
@@ -32,13 +32,13 @@
 			color: palette[Math.floor(Math.random() * palette.length)],
 			size: 6 + Math.random() * 6,
 			rotate: Math.random() * 360,
-		}));
+		}))
 
-		clearTimeout(timer);
+		clearTimeout(timer)
 		timer = setTimeout(() => {
-			particles = [];
-		}, 1500);
-	});
+			particles = []
+		}, 1500)
+	})
 </script>
 
 <div class="pointer-events-none fixed inset-0 z-[70] overflow-hidden">

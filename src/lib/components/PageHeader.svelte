@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Component, Snippet } from "svelte";
+	import type { Component, Snippet } from "svelte"
 
 	let {
 		title,
@@ -7,11 +7,11 @@
 		icon: Icon,
 		children,
 	}: {
-		title: string;
-		subtitle?: string;
-		icon?: Component;
-		children?: Snippet;
-	} = $props();
+		title: string
+		subtitle?: string
+		icon?: Component
+		children?: Snippet
+	} = $props()
 </script>
 
 <header class="sticky top-0 z-30 border-b border-neutral-200/70 bg-neutral-100/85 backdrop-blur-md">

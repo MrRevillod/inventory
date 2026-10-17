@@ -1,83 +1,83 @@
 <script lang="ts">
-	import autoAnimate from "@formkit/auto-animate";
-	import ChevronDown from "@lucide/svelte/icons/chevron-down";
-	import Package from "@lucide/svelte/icons/package";
-	import Pencil from "@lucide/svelte/icons/pencil";
-	import Plus from "@lucide/svelte/icons/plus";
-	import Tag from "@lucide/svelte/icons/tag";
-	import Trash2 from "@lucide/svelte/icons/trash-2";
-	import { untrack } from "svelte";
-	import { slide } from "svelte/transition";
-	import BottomSheet from "#lib/components/BottomSheet.svelte";
-	import CategoryIcon from "#lib/components/CategoryIcon.svelte";
-	import CategoryTabs from "#lib/components/CategoryTabs.svelte";
-	import PageHeader from "#lib/components/PageHeader.svelte";
-	import { categoryIconNames, categoryIcons, DEFAULT_ICON } from "#lib/icons";
-	import { formatCLP } from "#lib/money";
-	import { accentTones, tint } from "#lib/palette";
-	import { settings } from "#lib/settings.svelte";
-	import { toasts } from "#lib/toast.svelte";
-	import { enhance, type SubmitFunction } from "$app/forms";
-	import type { PageProps } from "./$types";
+	import autoAnimate from "@formkit/auto-animate"
+	import ChevronDown from "@lucide/svelte/icons/chevron-down"
+	import Package from "@lucide/svelte/icons/package"
+	import Pencil from "@lucide/svelte/icons/pencil"
+	import Plus from "@lucide/svelte/icons/plus"
+	import Tag from "@lucide/svelte/icons/tag"
+	import Trash2 from "@lucide/svelte/icons/trash-2"
+	import { untrack } from "svelte"
+	import { slide } from "svelte/transition"
+	import BottomSheet from "#lib/components/BottomSheet.svelte"
+	import CategoryIcon from "#lib/components/CategoryIcon.svelte"
+	import CategoryTabs from "#lib/components/CategoryTabs.svelte"
+	import PageHeader from "#lib/components/PageHeader.svelte"
+	import { categoryIconNames, categoryIcons, DEFAULT_ICON } from "#lib/icons"
+	import { formatCLP } from "#lib/money"
+	import { accentTones, tint } from "#lib/palette"
+	import { settings } from "#lib/settings.svelte"
+	import { toasts } from "#lib/toast.svelte"
+	import { enhance, type SubmitFunction } from "$app/forms"
+	import type { PageProps } from "./$types"
 
-	let { data }: PageProps = $props();
+	let { data }: PageProps = $props()
 
-	let activeCategoryId = $state<string | null>(untrack(() => data.categories[0]?.id ?? null));
-	let openSubcategory = $state<string | null>(null);
+	let activeCategoryId = $state<string | null>(untrack(() => data.categories[0]?.id ?? null))
+	let openSubcategory = $state<string | null>(null)
 
-	let categorySheet = $state<{ id: string | null; name: string; icon: string } | null>(null);
+	let categorySheet = $state<{ id: string | null; name: string; icon: string } | null>(null)
 	let subcategorySheet = $state<{
-		id: string | null;
-		name: string;
-		icon: string;
-		tone: number;
-		categoryId: string;
-	} | null>(null);
+		id: string | null
+		name: string
+		icon: string
+		tone: number
+		categoryId: string
+	} | null>(null)
 	let productSheet = $state<{
-		id: string | null;
-		name: string;
-		price: string;
-		subcategoryId: string;
-	} | null>(null);
-	let manageCategories = $state(false);
-	let confirmDelete = $state<{ action: string; id: string; message: string } | null>(null);
+		id: string | null
+		name: string
+		price: string
+		subcategoryId: string
+	} | null>(null)
+	let manageCategories = $state(false)
+	let confirmDelete = $state<{ action: string; id: string; message: string } | null>(null)
 
-	const tones = $derived(accentTones(settings.value.accent));
+	const tones = $derived(accentTones(settings.value.accent))
 	const activeCategory = $derived(
 		data.categories.find((category) => category.id === activeCategoryId) ??
 			data.categories[0] ??
 			null,
-	);
-	const subcategories = $derived(activeCategory?.subcategories ?? []);
-	const currentOpen = $derived(openSubcategory ?? subcategories[0]?.id ?? null);
-	const isOpen = (id: string) => currentOpen === id;
+	)
+	const subcategories = $derived(activeCategory?.subcategories ?? [])
+	const currentOpen = $derived(openSubcategory ?? subcategories[0]?.id ?? null)
+	const isOpen = (id: string) => currentOpen === id
 
 	function toggleSub(id: string) {
-		openSubcategory = currentOpen === id ? "" : id;
+		openSubcategory = currentOpen === id ? "" : id
 	}
 
 	function selectCategory(id: string) {
-		activeCategoryId = id;
-		openSubcategory = null;
+		activeCategoryId = id
+		openSubcategory = null
 	}
 
 	function openCategoryCreate() {
-		categorySheet = { id: null, name: "", icon: DEFAULT_ICON };
+		categorySheet = { id: null, name: "", icon: DEFAULT_ICON }
 	}
 
 	function openCategoryEdit(category: { id: string; name: string; icon: string }) {
-		categorySheet = { id: category.id, name: category.name, icon: category.icon };
+		categorySheet = { id: category.id, name: category.name, icon: category.icon }
 	}
 
 	function openSubcategoryCreate() {
-		if (!activeCategory) return;
+		if (!activeCategory) return
 		subcategorySheet = {
 			id: null,
 			name: "",
 			icon: DEFAULT_ICON,
 			tone: subcategories.length % 8,
 			categoryId: activeCategory.id,
-		};
+		}
 	}
 
 	function openSubcategoryEdit(sub: { id: string; name: string; icon: string; tone: number }) {
@@ -87,56 +87,56 @@
 			icon: sub.icon,
 			tone: sub.tone,
 			categoryId: activeCategoryId ?? "",
-		};
+		}
 	}
 
 	function openProductCreate(subcategoryId: string) {
-		productSheet = { id: null, name: "", price: "", subcategoryId };
+		productSheet = { id: null, name: "", price: "", subcategoryId }
 	}
 
 	function openProductEdit(product: {
-		id: string;
-		name: string;
-		price: number;
-		subcategoryId: string;
+		id: string
+		name: string
+		price: number
+		subcategoryId: string
 	}) {
 		productSheet = {
 			id: product.id,
 			name: product.name,
 			price: String(product.price),
 			subcategoryId: product.subcategoryId,
-		};
+		}
 	}
 
 	function setCategoryIcon(icon: string) {
-		if (categorySheet) categorySheet.icon = icon;
+		if (categorySheet) categorySheet.icon = icon
 	}
 
 	function setSubcategoryIcon(icon: string) {
-		if (subcategorySheet) subcategorySheet.icon = icon;
+		if (subcategorySheet) subcategorySheet.icon = icon
 	}
 
 	function setSubcategoryTone(tone: number) {
-		if (subcategorySheet) subcategorySheet.tone = tone;
+		if (subcategorySheet) subcategorySheet.tone = tone
 	}
 
 	function firstError(payload: unknown): string {
-		const errors = (payload as { errors?: Record<string, string[]> })?.errors;
-		const first = errors ? Object.values(errors).flat()[0] : undefined;
-		return first ?? "Revisa los datos";
+		const errors = (payload as { errors?: Record<string, string[]> })?.errors
+		const first = errors ? Object.values(errors).flat()[0] : undefined
+		return first ?? "Revisa los datos"
 	}
 
 	function savedHandler(onSuccess: () => void, message: string): SubmitFunction {
 		return () =>
 			async ({ result, update }) => {
 				if (result.type === "failure") {
-					toasts.show(firstError(result.data), "error");
+					toasts.show(firstError(result.data), "error")
 				} else if (result.type === "success") {
-					onSuccess();
-					toasts.show(message, "success");
+					onSuccess()
+					toasts.show(message, "success")
 				}
-				await update();
-			};
+				await update()
+			}
 	}
 </script>
 
@@ -174,9 +174,7 @@
 					</span>
 					<ChevronDown
 						size={18}
-						class="shrink-0 text-neutral-300 transition-transform duration-200 {isOpen(
-							sub.id,
-						)
+						class="shrink-0 text-neutral-300 transition-transform duration-200 {isOpen(sub.id)
 							? "rotate-180"
 							: ""}"
 					/>
@@ -220,9 +218,7 @@
 				>
 					{#each sub.products as product (product.id)}
 						<li class="flex items-center gap-2 px-4 py-3">
-							<span class="min-w-0 flex-1 truncate text-sm text-neutral-700"
-								>{product.name}</span
-							>
+							<span class="min-w-0 flex-1 truncate text-sm text-neutral-700">{product.name}</span>
 							<span class="text-sm font-semibold text-neutral-800 tabular-nums">
 								{formatCLP(product.price)}
 							</span>
@@ -297,8 +293,8 @@
 				<button
 					type="button"
 					onclick={() => {
-						manageCategories = false;
-						openCategoryEdit(category);
+						manageCategories = false
+						openCategoryEdit(category)
 					}}
 					aria-label="Editar categoría"
 					class="flex size-8 items-center justify-center rounded-pill text-neutral-400 transition-colors active:bg-neutral-100"
@@ -324,8 +320,8 @@
 	<button
 		type="button"
 		onclick={() => {
-			manageCategories = false;
-			openCategoryCreate();
+			manageCategories = false
+			openCategoryCreate()
 		}}
 		class="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-primary-200 py-3 text-sm font-semibold text-primary-600 transition-colors active:bg-primary-50"
 	>
@@ -351,9 +347,7 @@
 			{/if}
 			<input type="hidden" name="icon" value={categorySheet.icon}>
 			<label class="block">
-				<span
-					class="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-neutral-700"
-				>
+				<span class="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-neutral-700">
 					<Tag size={15} />
 					Nombre
 				</span>
@@ -414,9 +408,7 @@
 			<input type="hidden" name="tone" value={subcategorySheet.tone}>
 			<input type="hidden" name="categoryId" value={subcategorySheet.categoryId}>
 			<label class="block">
-				<span
-					class="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-neutral-700"
-				>
+				<span class="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-neutral-700">
 					<Tag size={15} />
 					Nombre
 				</span>
@@ -505,9 +497,7 @@
 				>
 			</label>
 			<label class="block">
-				<span class="mb-1.5 block text-sm font-semibold text-neutral-700"
-					>Precio (CLP)</span
-				>
+				<span class="mb-1.5 block text-sm font-semibold text-neutral-700">Precio (CLP)</span>
 				<input
 					name="price"
 					type="number"
@@ -520,9 +510,7 @@
 				>
 			</label>
 			<label class="block">
-				<span class="mb-1.5 block text-sm font-semibold text-neutral-700"
-					>Subcategoría</span
-				>
+				<span class="mb-1.5 block text-sm font-semibold text-neutral-700">Subcategoría</span>
 				<select
 					name="subcategoryId"
 					bind:value={productSheet.subcategoryId}
@@ -559,10 +547,10 @@
 		use:enhance={() =>
 			async ({ result, update }) => {
 				if (result.type === "success") {
-					confirmDelete = null;
-					toasts.show("Eliminado", "success");
+					confirmDelete = null
+					toasts.show("Eliminado", "success")
 				}
-				await update();
+				await update()
 			}}
 		class="mt-5 flex gap-3"
 	>

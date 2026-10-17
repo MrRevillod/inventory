@@ -11,19 +11,19 @@
 			// Apply stored settings before first paint to avoid a flash of the
 			// default accent color.
 			try {
-				var s = JSON.parse(localStorage.getItem("pymeapp:settings") || "null");
+				var s = JSON.parse(localStorage.getItem("pymeapp:settings") || "null")
 				if (s) {
-					var p = s.palette || {};
+					var p = s.palette || {}
 					for (var k in p) {
-						document.documentElement.style.setProperty("--color-primary-" + k, p[k]);
+						document.documentElement.style.setProperty("--color-primary-" + k, p[k])
 					}
 					if (s.accent) {
-						document.documentElement.style.setProperty("--color-primary", s.accent);
-						var m = document.querySelector('meta[name="theme-color"]');
-						if (m) m.setAttribute("content", s.accent);
+						document.documentElement.style.setProperty("--color-primary", s.accent)
+						var m = document.querySelector('meta[name="theme-color"]')
+						if (m) m.setAttribute("content", s.accent)
 					}
-					var px = { compact: "15px", normal: "16px", large: "17.5px" }[s.uiScale];
-					if (px) document.documentElement.style.fontSize = px;
+					var px = { compact: "15px", normal: "16px", large: "17.5px" }[s.uiScale]
+					if (px) document.documentElement.style.fontSize = px
 					var radius = {
 						round: {
 							lg: "0.5rem",
@@ -40,13 +40,10 @@
 							pill: "1rem",
 						},
 						square: { lg: "0", xl: "0", "2xl": "0", "3xl": "0", pill: "0" },
-					}[s.radius];
+					}[s.radius]
 					if (radius) {
 						for (var rk in radius) {
-							document.documentElement.style.setProperty(
-								"--radius-" + rk,
-								radius[rk],
-							);
+							document.documentElement.style.setProperty("--radius-" + rk, radius[rk])
 						}
 					}
 				}

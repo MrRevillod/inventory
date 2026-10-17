@@ -1,17 +1,17 @@
 // Seed data ported from legacy/lib/db.ts (nail-salon services and products),
 // organized as Category -> Subcategory -> Product.
 // Run with `pnpm db:seed` against a migrated database.
-import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../src/lib/server/generated/prisma/client";
+import "dotenv/config"
+import { PrismaPg } from "@prisma/adapter-pg"
+import { PrismaClient } from "../src/lib/server/generated/prisma/client"
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+const prisma = new PrismaClient({ adapter })
 
 const categories = [
 	{ id: "cat-products", name: "Productos", icon: "shopping-bag", position: 0 },
 	{ id: "cat-services", name: "Servicios", icon: "sparkles", position: 1 },
-];
+]
 
 const subcategories = [
 	// Productos
@@ -112,7 +112,7 @@ const subcategories = [
 		position: 5,
 		categoryId: "cat-services",
 	},
-];
+]
 
 const products = [
 	{
@@ -169,7 +169,7 @@ const products = [
 		price: 2200,
 		subcategoryId: "products-decorations",
 	},
-];
+]
 
 async function main() {
 	for (const category of categories) {
@@ -182,7 +182,7 @@ async function main() {
 				deletedAt: null,
 			},
 			create: category,
-		});
+		})
 	}
 
 	for (const subcategory of subcategories) {
@@ -197,7 +197,7 @@ async function main() {
 				deletedAt: null,
 			},
 			create: subcategory,
-		});
+		})
 	}
 
 	for (const product of products) {
@@ -210,18 +210,18 @@ async function main() {
 				deletedAt: null,
 			},
 			create: product,
-		});
+		})
 	}
 
 	console.log(
 		`Seeded ${categories.length} categories, ${subcategories.length} subcategories and ${products.length} products.`,
-	);
+	)
 }
 
 main()
 	.then(() => prisma.$disconnect())
 	.catch(async (error) => {
-		console.error(error);
-		await prisma.$disconnect();
-		process.exit(1);
-	});
+		console.error(error)
+		await prisma.$disconnect()
+		process.exit(1)
+	})

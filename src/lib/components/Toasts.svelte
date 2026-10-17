@@ -1,8 +1,8 @@
 <script lang="ts">
-	import CircleCheck from "@lucide/svelte/icons/circle-check";
-	import CircleX from "@lucide/svelte/icons/circle-x";
-	import { fly } from "svelte/transition";
-	import { toasts } from "#lib/toast.svelte";
+	import CircleCheck from "@lucide/svelte/icons/circle-check"
+	import CircleX from "@lucide/svelte/icons/circle-x"
+	import { fly } from "svelte/transition"
+	import { toasts } from "#lib/toast.svelte"
 </script>
 
 <div

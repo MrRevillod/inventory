@@ -1,44 +1,44 @@
 <script lang="ts">
-	import autoAnimate from "@formkit/auto-animate";
-	import Check from "@lucide/svelte/icons/check";
-	import ChevronDown from "@lucide/svelte/icons/chevron-down";
-	import Minus from "@lucide/svelte/icons/minus";
-	import Plus from "@lucide/svelte/icons/plus";
-	import Search from "@lucide/svelte/icons/search";
-	import ShoppingBag from "@lucide/svelte/icons/shopping-bag";
-	import Sparkles from "@lucide/svelte/icons/sparkles";
-	import Trash2 from "@lucide/svelte/icons/trash-2";
-	import X from "@lucide/svelte/icons/x";
-	import { untrack } from "svelte";
-	import { fly, slide } from "svelte/transition";
-	import { cart } from "#lib/cart.svelte";
-	import BottomSheet from "#lib/components/BottomSheet.svelte";
-	import CategoryIcon from "#lib/components/CategoryIcon.svelte";
-	import CategoryTabs from "#lib/components/CategoryTabs.svelte";
-	import { confetti } from "#lib/confetti.svelte";
-	import { formatCLP } from "#lib/money";
-	import { accentTones, tint } from "#lib/palette";
-	import { settings } from "#lib/settings.svelte";
-	import { toasts } from "#lib/toast.svelte";
-	import type { CatalogProduct } from "#lib/types";
-	import { enhance } from "$app/forms";
-	import type { PageProps } from "./$types";
+	import autoAnimate from "@formkit/auto-animate"
+	import Check from "@lucide/svelte/icons/check"
+	import ChevronDown from "@lucide/svelte/icons/chevron-down"
+	import Minus from "@lucide/svelte/icons/minus"
+	import Plus from "@lucide/svelte/icons/plus"
+	import Search from "@lucide/svelte/icons/search"
+	import ShoppingBag from "@lucide/svelte/icons/shopping-bag"
+	import Sparkles from "@lucide/svelte/icons/sparkles"
+	import Trash2 from "@lucide/svelte/icons/trash-2"
+	import X from "@lucide/svelte/icons/x"
+	import { untrack } from "svelte"
+	import { fly, slide } from "svelte/transition"
+	import { cart } from "#lib/cart.svelte"
+	import BottomSheet from "#lib/components/BottomSheet.svelte"
+	import CategoryIcon from "#lib/components/CategoryIcon.svelte"
+	import CategoryTabs from "#lib/components/CategoryTabs.svelte"
+	import { confetti } from "#lib/confetti.svelte"
+	import { formatCLP } from "#lib/money"
+	import { accentTones, tint } from "#lib/palette"
+	import { settings } from "#lib/settings.svelte"
+	import { toasts } from "#lib/toast.svelte"
+	import type { CatalogProduct } from "#lib/types"
+	import { enhance } from "$app/forms"
+	import type { PageProps } from "./$types"
 
-	let { data }: PageProps = $props();
+	let { data }: PageProps = $props()
 
-	let search = $state("");
-	let cartOpen = $state(false);
-	let activeCategoryId = $state<string | null>(untrack(() => data.categories[0]?.id ?? null));
-	let openSubcategory = $state<string | null>(null);
+	let search = $state("")
+	let cartOpen = $state(false)
+	let activeCategoryId = $state<string | null>(untrack(() => data.categories[0]?.id ?? null))
+	let openSubcategory = $state<string | null>(null)
 
-	const tones = $derived(accentTones(settings.value.accent));
-	const searching = $derived(search.trim().length > 0);
+	const tones = $derived(accentTones(settings.value.accent))
+	const searching = $derived(search.trim().length > 0)
 
 	const activeCategory = $derived(
 		data.categories.find((category) => category.id === activeCategoryId) ??
 			data.categories[0] ??
 			null,
-	);
+	)
 
 	const subcategories = $derived(
 		(activeCategory?.subcategories ?? [])
@@ -49,26 +49,26 @@
 				),
 			}))
 			.filter((sub) => sub.products.length > 0),
-	);
+	)
 
-	const currentOpen = $derived(openSubcategory ?? subcategories[0]?.id ?? null);
+	const currentOpen = $derived(openSubcategory ?? subcategories[0]?.id ?? null)
 
-	const isOpen = (id: string) => searching || currentOpen === id;
+	const isOpen = (id: string) => searching || currentOpen === id
 
 	function toggleSub(id: string) {
-		if (searching) return;
-		openSubcategory = currentOpen === id ? "" : id;
+		if (searching) return
+		openSubcategory = currentOpen === id ? "" : id
 	}
 
 	function selectCategory(id: string) {
-		activeCategoryId = id;
-		openSubcategory = null;
-		search = "";
+		activeCategoryId = id
+		openSubcategory = null
+		search = ""
 	}
 
 	function add(product: CatalogProduct) {
-		cart.add(product);
-		toasts.show(`${product.name} agregado`, "success");
+		cart.add(product)
+		toasts.show(`${product.name} agregado`, "success")
 	}
 </script>
 
@@ -139,9 +139,7 @@
 				</span>
 				<ChevronDown
 					size={18}
-					class="shrink-0 text-neutral-300 transition-transform duration-200 {isOpen(
-						sub.id,
-					)
+					class="shrink-0 text-neutral-300 transition-transform duration-200 {isOpen(sub.id)
 						? "rotate-180"
 						: ""}"
 				/>
@@ -155,16 +153,11 @@
 								onclick={() => add(product)}
 								class="flex min-h-24 flex-col items-start gap-2 rounded-2xl bg-neutral-50 p-4 text-left ring-1 ring-neutral-200/60 transition-transform duration-150 active:scale-[0.96]"
 							>
-								<span
-									class="line-clamp-2 text-sm leading-snug font-semibold text-neutral-800"
-								>
+								<span class="line-clamp-2 text-sm leading-snug font-semibold text-neutral-800">
 									{product.name}
 								</span>
 								<span class="mt-auto flex w-full items-center justify-between">
-									<span
-										class="text-sm font-bold tabular-nums"
-										style="color: {color}"
-									>
+									<span class="text-sm font-bold tabular-nums" style="color: {color}">
 										{formatCLP(product.price)}
 									</span>
 									<span
@@ -245,9 +238,7 @@
 							<Minus size={15} />
 						{/if}
 					</button>
-					<span class="w-6 text-center text-sm font-bold tabular-nums"
-						>{item.quantity}</span
-					>
+					<span class="w-6 text-center text-sm font-bold tabular-nums">{item.quantity}</span>
 					<button
 						type="button"
 						onclick={() => cart.add(item)}
@@ -280,13 +271,13 @@
 		use:enhance={() =>
 			async ({ result, update }) => {
 				if (result.type === "success") {
-					const total = cart.total;
-					cart.clear();
-					cartOpen = false;
-					toasts.show(`Venta registrada · ${formatCLP(total)}`, "success");
-					confetti.fire();
+					const total = cart.total
+					cart.clear()
+					cartOpen = false
+					toasts.show(`Venta registrada · ${formatCLP(total)}`, "success")
+					confetti.fire()
 				}
-				await update();
+				await update()
 			}}
 		class="mt-4"
 	>
@@ -303,8 +294,8 @@
 	<button
 		type="button"
 		onclick={() => {
-			cart.clear();
-			cartOpen = false;
+			cart.clear()
+			cartOpen = false
 		}}
 		disabled={cart.items.length === 0}
 		class="mt-2 w-full rounded-2xl border border-primary-200 py-3.5 text-sm font-semibold text-primary-600 transition-colors active:bg-primary-50 disabled:opacity-40"
