@@ -110,7 +110,7 @@
 			class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-600 py-4 text-base font-bold text-white shadow-lg shadow-primary-600/25 transition-transform active:scale-[0.98] disabled:opacity-40"
 		>
 			<Check size={18} />
-			Finalizar venta
+			Finalizar
 		</button>
 	</form>
 	<button

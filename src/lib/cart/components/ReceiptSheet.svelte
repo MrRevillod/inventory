@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Check from "@lucide/svelte/icons/check"
 	import Share2 from "@lucide/svelte/icons/share-2"
 	import Download from "@lucide/svelte/icons/download"
 
@@ -19,7 +18,7 @@
 	let shareable = $state(false)
 	let drawing = $state(false)
 
-	const filename = $derived(receipt ? receiptFilename(receipt.createdAt) : "boleta.png")
+	const filename = $derived(receipt ? receiptFilename(receipt.createdAt) : "resumen.png")
 
 	$effect(() => {
 		const data = receipt
@@ -41,7 +40,7 @@
 			})
 			.catch((error) => {
 				console.error("[receipt] no se pudo generar la imagen:", error)
-				toasts.show("No se pudo generar la boleta", "error")
+				toasts.show("No se pudo generar el resumen", "error")
 			})
 			.finally(() => {
 				if (!stale) drawing = false
@@ -55,7 +54,7 @@
 
 	async function share() {
 		if (!blob) return
-		const text = `Venta ${Money.format(receipt?.total ?? 0)}`
+		const text = `Atención ${Money.format(receipt?.total ?? 0)}`
 		const outcome = await shareImage(blob, filename, text)
 		if (outcome === "failed") {
 			toasts.show("No se pudo compartir, descargando la imagen", "error")
@@ -74,18 +73,13 @@
 	}
 </script>
 
-<BottomSheet open={receipt !== null} title="Boleta" {onclose}>
+<BottomSheet open={receipt !== null} title="Resumen de atención" {onclose}>
 	<div class="flex min-h-[74dvh] flex-col">
-		<div class="flex items-center justify-center gap-2 pb-3 text-sm font-semibold text-primary-600">
-			<Check size={16} />
-			Venta registrada
-		</div>
-
 		<div class="flex min-h-0 flex-1 items-start justify-center overflow-y-auto">
 			{#if preview}
 				<img
 					src={preview}
-					alt="Boleta de la venta"
+					alt="Resumen de la atención"
 					class="w-full rounded-2xl ring-1 ring-neutral-200/70"
 				>
 			{:else}
@@ -101,17 +95,11 @@
 			{/if}
 		</div>
 
-		<p class="pt-3 pb-2 text-center text-xs text-neutral-400">
-			{shareable
-				? "Elige WhatsApp u otra app en el menú de compartir."
-				: "Puedes guardar la imagen y enviarla por tu cuenta."}
-		</p>
-
-		<div class="grid grid-cols-[auto_1fr] gap-2">
+		<div class="grid grid-cols-2 gap-2 pt-3">
 			<button
 				type="button"
 				onclick={onclose}
-				class="rounded-2xl border border-neutral-200 px-6 py-3.5 text-sm font-semibold text-neutral-600 transition-colors active:bg-neutral-100"
+				class="flex items-center justify-center rounded-2xl border border-neutral-200 py-3.5 text-sm font-semibold text-neutral-600 transition-colors active:bg-neutral-100"
 			>
 				Salir
 			</button>

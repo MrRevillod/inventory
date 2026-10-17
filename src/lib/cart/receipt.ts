@@ -86,7 +86,7 @@ export async function renderReceipt(data: ReceiptData): Promise<Blob> {
 	y += 50
 	setFont(ctx, 400, 20)
 	ctx.fillStyle = MUTED
-	ctx.fillText("Boleta de venta", PADDING, y + 18)
+	ctx.fillText("Resumen de atención", PADDING, y + 18)
 	ctx.textAlign = "right"
 	ctx.fillText(DateTime.format(data.createdAt), right, y + 18)
 	ctx.textAlign = "left"
@@ -145,10 +145,10 @@ export async function renderReceipt(data: ReceiptData): Promise<Blob> {
 	})
 }
 
-/** e.g. `boleta-20261017-2145.png`. */
+/** e.g. `resumen-20261017-2145.png`. */
 export function receiptFilename(createdAt: string): string {
 	const date = new Date(createdAt)
 	const pad = (value: number) => String(value).padStart(2, "0")
 	const stamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`
-	return `boleta-${stamp}-${pad(date.getHours())}${pad(date.getMinutes())}.png`
+	return `resumen-${stamp}-${pad(date.getHours())}${pad(date.getMinutes())}.png`
 }

@@ -9,7 +9,7 @@
 	import { cart } from "#lib/cart/cart.svelte"
 
 	const links = [
-		{ href: "/", label: "Vender", icon: ShoppingCart },
+		{ href: "/", label: "Atención", icon: ShoppingCart },
 		{ href: "/inventory", label: "Inventario", icon: Package },
 		{ href: "/history", label: "Historial", icon: History },
 		{ href: "/settings", label: "Ajustes", icon: Settings },

@@ -177,7 +177,8 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   the fallback. The canvas keeps a portrait `MIN_HEIGHT` plus a per-item gap so
   a 1–2 item sale fills the sheet, with the total and footer anchored to the
   bottom; the preview sits in a flexible scroll area so the two buttons stay
-  put.
+  put. The UI calls it **"Resumen de atención"** — never "boleta", which in
+  Chile means a fiscal document.
 - Zod schemas live in each module's `dtos.ts` and use **Zod Mini**
   (`import * as z from "zod/mini"`); validators are functions passed to
   `.check(...)` (e.g. `z.trim()`, `z.minLength(1, msg)`), with `z.coerce`,
@@ -240,24 +241,31 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   `static/logo.svg` with `pnpm pwa:assets`. `src/app.html` links the manifest,
   the favicon and the apple-touch icon; the icon and head links are the only
   reason to touch `app.html` for the PWA.
-- The service worker precaches `immutable` + `assets` + `prerendered`
-  (cache-first for those), is **network-first for navigations** with the
-  prerendered `/offline` page as fallback, and **network-only for everything
-  else** — a POS must never serve stale sales or inventory.
+- The service worker **only intercepts what it owns**: precached paths
+  (`immutable` + `assets` + `prerendered`, cache-first) and navigations
+  (network-first with the prerendered `/offline` fallback). Everything else —
+  load data, form actions — is left to the browser, so responses are never
+  stale and a hiccup can't surface as an uncaught "Failed to fetch". Do not
+  reintroduce a catch-all `respondWith` pass-through.
 - `/pwa` is the install screen: `beforeinstallprompt` on Chromium, manual
   "Añadir a pantalla de inicio" steps on iOS; it is linked from `/settings`.
   `/offline` is the offline fallback. Both are prerendered via
   `prerender.entries` in `vite.config.ts` with `crawl: false`, so the
   database-backed routes (`/`, `/inventory`, `/history`) are never prerendered.
 - The service worker is only built and registered for production: test with
-  `pnpm build && pnpm preview`, **not** `pnpm dev`. `src/service-worker` is
+  `pnpm build && pnpm preview`, **not** `pnpm dev`. `src/hooks.client.ts`
+  unregisters any service worker in dev — SvelteKit does not register one
+  there, so a leftover from a build or preview run would otherwise keep
+  intercepting every request and cannot update itself. `src/service-worker` is
   excluded from the root `tsconfig.json` and ships its own `tsconfig.json`
   extending `$app/tsconfig/service-worker`.
 
 ## Domain
 
-- UI is in Spanish. Prices are integer Chilean pesos (CLP, no decimals); format
-  with `Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" })`.
+- UI is in Spanish. Call a transaction an **"atención"** — never "venta": the
+  app covers sales, services and appointments alike. Prices are integer Chilean
+  pesos (CLP, no decimals); format with
+  `Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" })`.
 - Data model (`prisma/schema.prisma`): `Category` → `Subcategory` (with `icon` +
   `tone`) → `Product` → `SaleItem`. Only subcategories carry `tone` (color derived
   from the accent). `SaleItem` snapshots `name` and `price` so sales history stays

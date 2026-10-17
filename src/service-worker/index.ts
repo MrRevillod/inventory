@@ -30,42 +30,44 @@ self.addEventListener("activate", (event) => {
 	)
 })
 
+// Only intercept what this worker owns: requests for precached output (build
+// files and `static/`) and navigations. Everything else is deliberately left
+// alone — passing a request through `respondWith` only adds latency and turns
+// any hiccup into an uncaught "Failed to fetch".
 self.addEventListener("fetch", (event) => {
 	const { request } = event
-
-	// Only same-origin GETs; everything else goes straight to the network.
 	if (request.method !== "GET") return
-	if (new URL(request.url).origin !== self.location.origin) return
 
-	event.respondWith(respond(request))
+	const url = new URL(request.url)
+	if (url.origin !== self.location.origin) return
+
+	if (PRECACHE.includes(url.pathname)) {
+		event.respondWith(cacheFirst(url.pathname, request))
+		return
+	}
+
+	if (request.mode === "navigate") {
+		event.respondWith(navigate(request))
+	}
 })
 
-async function respond(request: Request): Promise<Response> {
-	const url = new URL(request.url)
+/** Build output and static files never change within a deployment. */
+async function cacheFirst(pathname: string, request: Request): Promise<Response> {
 	const cache = await caches.open(CACHE)
+	return (await cache.match(pathname)) ?? fetch(request)
+}
 
-	// Build output and static files never change within a deployment: cache-first.
-	if (PRECACHE.includes(url.pathname)) {
-		const cached = await cache.match(url.pathname)
-		if (cached) return cached
+/** Fresh data when online, the offline page when not. */
+async function navigate(request: Request): Promise<Response> {
+	try {
+		return await fetch(request)
+	} catch {
+		const cache = await caches.open(CACHE)
+		const offline = await cache.match(OFFLINE)
+		if (offline) return offline
+		return new Response("Sin conexión", {
+			status: 503,
+			headers: { "content-type": "text/plain; charset=utf-8" },
+		})
 	}
-
-	// Navigations: network-first so data is always fresh, with the offline
-	// page as the fallback.
-	if (request.mode === "navigate") {
-		try {
-			return await fetch(request)
-		} catch {
-			const offline = await cache.match(OFFLINE)
-			if (offline) return offline
-			return new Response("Sin conexión", {
-				status: 503,
-				headers: { "content-type": "text/plain; charset=utf-8" },
-			})
-		}
-	}
-
-	// Everything else (load data, form actions): network only. A POS must never
-	// serve stale sales or inventory.
-	return fetch(request)
 }

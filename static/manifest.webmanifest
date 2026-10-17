@@ -2,7 +2,7 @@
 	"id": "/",
 	"name": "inventory",
 	"short_name": "inventory",
-	"description": "Punto de venta, inventario y servicios para tu salón de uñas.",
+	"description": "Inventario y atenciones para tu salón de uñas.",
 	"lang": "es",
 	"dir": "ltr",
 	"start_url": "/",
@@ -27,8 +27,8 @@
 	],
 	"shortcuts": [
 		{
-			"name": "Vender",
-			"short_name": "Vender",
+			"name": "Atención",
+			"short_name": "Atención",
 			"url": "/",
 			"icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192", "type": "image/png" }]
 		},

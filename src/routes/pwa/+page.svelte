@@ -64,7 +64,9 @@
 		>
 		<div>
 			<h2 class="text-lg font-extrabold tracking-tight">{settings.value.storeName}</h2>
-			<p class="text-xs text-neutral-400">Inventario, ventas y servicios de tu salón de uñas.</p>
+			<p class="text-xs text-neutral-400">
+				Inventario, atenciones y servicios de tu salón de uñas.
+			</p>
 		</div>
 
 		{#if installed}

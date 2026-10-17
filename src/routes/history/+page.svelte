@@ -44,7 +44,7 @@
 	})
 </script>
 
-<PageHeader title="Historial" subtitle="Ventas registradas" icon={History} />
+<PageHeader title="Historial" subtitle="Atenciones registradas" icon={History} />
 
 <div class="flex gap-2 overflow-x-auto px-5 py-3 [scrollbar-width:none]">
 	{#each PERIODS as option (option.key)}
@@ -94,7 +94,7 @@
 			<p class="text-2xl font-extrabold tabular-nums">{Money.format(data.summary.total)}</p>
 		</div>
 		<div class="text-right">
-			<p class="text-xs opacity-80">Ventas</p>
+			<p class="text-xs opacity-80">Atenciones</p>
 			<p class="text-2xl font-extrabold tabular-nums">{data.summary.count}</p>
 		</div>
 	</div>
@@ -121,8 +121,8 @@
 			class="flex flex-col items-center gap-2 rounded-3xl bg-white py-16 text-center ring-1 ring-neutral-200/70"
 		>
 			<Receipt size={30} class="text-neutral-300" />
-			<p class="text-sm text-neutral-500">No hay ventas en este período.</p>
-			<a href="/" class="text-sm font-semibold text-primary-600">Ir a vender</a>
+			<p class="text-sm text-neutral-500">No hay atenciones en este período.</p>
+			<a href="/" class="text-sm font-semibold text-primary-600">Registrar una atención</a>
 		</div>
 	{/each}
 </div>

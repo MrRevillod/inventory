@@ -83,7 +83,7 @@
 			<h1 class="truncate text-lg leading-tight font-extrabold tracking-tight">
 				{settings.value.storeName || "inventory"}
 			</h1>
-			<p class="text-xs text-neutral-400">Punto de venta</p>
+			<p class="text-xs text-neutral-400">Nueva atención</p>
 		</div>
 	</div>
 	<div class="px-5">
