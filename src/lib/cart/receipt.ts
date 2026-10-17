@@ -7,9 +7,21 @@ import { DateTime } from "#lib/shared/value-objects/date.value"
 import type { ReceiptData } from "./dtos"
 
 const WIDTH = 640
-const PADDING = 40
+const PADDING = 56
 const SCALE = 2
-const ITEM_HEIGHT = 62
+
+/** Header block (store name + subtitle/date + rule spacing), from `PADDING`. */
+const HEADER = 120
+/** Vertical space each line gets; the extra is the gap to the next item. */
+const ITEM_HEIGHT = 84
+/** Smallest gap kept between the last item and the total rule. */
+const MIN_GAP_AFTER_ITEMS = 24
+const RULE_TO_TOTAL = 44
+const TOTAL_TO_FOOTER = 46
+/** Keeps a 1–2 item sale portrait so it fills the sheet height. */
+const MIN_HEIGHT = 800
+
+const BOTTOM = MIN_GAP_AFTER_ITEMS + RULE_TO_TOTAL + TOTAL_TO_FOOTER + PADDING
 
 const FONT_FAMILY = `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`
 const INK = "#111111"
@@ -32,30 +44,40 @@ function fit(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): str
 	return `${cut}…`
 }
 
-function height(items: number): number {
-	return PADDING + 88 + 36 + items * ITEM_HEIGHT + 46 + 56 + 40 + PADDING
+function rule(ctx: CanvasRenderingContext2D, y: number, right: number): void {
+	ctx.strokeStyle = RULE
+	ctx.lineWidth = 2
+	ctx.beginPath()
+	ctx.moveTo(PADDING, y)
+	ctx.lineTo(right, y)
+	ctx.stroke()
 }
 
 /** Renders the receipt as a PNG. */
 export async function renderReceipt(data: ReceiptData): Promise<Blob> {
 	const canvas = document.createElement("canvas")
-	const logicalHeight = height(data.items.length)
+	const itemsTop = PADDING + HEADER
+	const itemsEnd = itemsTop + data.items.length * ITEM_HEIGHT
+	const height = Math.max(MIN_HEIGHT, itemsEnd + BOTTOM)
 
 	canvas.width = WIDTH * SCALE
-	canvas.height = logicalHeight * SCALE
+	canvas.height = height * SCALE
 
 	const ctx = canvas.getContext("2d")
 	if (!ctx) throw new Error("No se pudo preparar el lienzo")
 
 	ctx.scale(SCALE, SCALE)
 	ctx.fillStyle = "#ffffff"
-	ctx.fillRect(0, 0, WIDTH, logicalHeight)
+	ctx.fillRect(0, 0, WIDTH, height)
 	ctx.textBaseline = "alphabetic"
 
 	const right = WIDTH - PADDING
-	let y = PADDING
+	const footerY = height - PADDING
+	const totalY = footerY - TOTAL_TO_FOOTER
+	const ruleY = totalY - RULE_TO_TOTAL
 
-	// Header: store name, then subtitle and date.
+	// Header.
+	let y = PADDING
 	setFont(ctx, 700, 36)
 	ctx.fillStyle = INK
 	ctx.textAlign = "left"
@@ -70,15 +92,12 @@ export async function renderReceipt(data: ReceiptData): Promise<Blob> {
 	ctx.textAlign = "left"
 
 	y += 34
-	ctx.strokeStyle = RULE
-	ctx.lineWidth = 2
-	ctx.beginPath()
-	ctx.moveTo(PADDING, y)
-	ctx.lineTo(right, y)
-	ctx.stroke()
-	y += 36
+	rule(ctx, y, right)
 
-	// Items: name + line total, then quantity × unit price.
+	// Items, right under the header. The leftover space (short sales) stays as a
+	// single gap before the total, which is how a receipt reads.
+	y = itemsTop
+
 	for (const item of data.items) {
 		const lineTotal = Money.format(item.price * item.quantity)
 
@@ -87,41 +106,35 @@ export async function renderReceipt(data: ReceiptData): Promise<Blob> {
 		ctx.textAlign = "right"
 		const totalWidth = ctx.measureText(lineTotal).width
 		ctx.textAlign = "left"
-		ctx.fillText(fit(ctx, item.name, WIDTH - PADDING * 2 - totalWidth - 24), PADDING, y + 24)
+		ctx.fillText(fit(ctx, item.name, WIDTH - PADDING * 2 - totalWidth - 24), PADDING, y + 26)
 		ctx.textAlign = "right"
-		ctx.fillText(lineTotal, right, y + 24)
+		ctx.fillText(lineTotal, right, y + 26)
 		ctx.textAlign = "left"
 
-		y += 30
+		y += 32
 		setFont(ctx, 400, 20)
 		ctx.fillStyle = MUTED
 		ctx.fillText(`${item.quantity} × ${Money.format(item.price)}`, PADDING, y + 20)
 
-		y += ITEM_HEIGHT - 30
+		y += ITEM_HEIGHT - 32
 	}
 
-	ctx.strokeStyle = RULE
-	ctx.beginPath()
-	ctx.moveTo(PADDING, y)
-	ctx.lineTo(right, y)
-	ctx.stroke()
-	y += 46
+	// Total and footer, anchored to the bottom.
+	rule(ctx, ruleY, right)
 
-	// Total.
 	setFont(ctx, 700, 22)
 	ctx.fillStyle = MUTED
-	ctx.fillText("TOTAL", PADDING, y + 30)
+	ctx.fillText("TOTAL", PADDING, totalY + 30)
 	setFont(ctx, 800, 40)
 	ctx.fillStyle = data.accent
 	ctx.textAlign = "right"
-	ctx.fillText(Money.format(data.total), right, y + 30)
+	ctx.fillText(Money.format(data.total), right, totalY + 30)
 	ctx.textAlign = "left"
 
-	y += 56
 	setFont(ctx, 400, 20)
 	ctx.fillStyle = MUTED
 	ctx.textAlign = "center"
-	ctx.fillText("¡Gracias por tu compra!", WIDTH / 2, y + 20)
+	ctx.fillText("¡Gracias por tu compra!", WIDTH / 2, footerY)
 	ctx.textAlign = "left"
 
 	return await new Promise<Blob>((resolve, reject) => {

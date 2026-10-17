@@ -174,7 +174,10 @@ Use pnpm (`pnpm-lock.yaml`; `.npmrc` sets `engine-strict=true`).
   and `src/lib/shared/share.ts` shares the PNG through the Web Share API. File
   sharing needs HTTPS, a user gesture and a browser that supports it, so the
   image is rendered **before** the share button appears and a download stays as
-  the fallback.
+  the fallback. The canvas keeps a portrait `MIN_HEIGHT` plus a per-item gap so
+  a 1–2 item sale fills the sheet, with the total and footer anchored to the
+  bottom; the preview sits in a flexible scroll area so the two buttons stay
+  put.
 - Zod schemas live in each module's `dtos.ts` and use **Zod Mini**
   (`import * as z from "zod/mini"`); validators are functions passed to
   `.check(...)` (e.g. `z.trim()`, `z.minLength(1, msg)`), with `z.coerce`,

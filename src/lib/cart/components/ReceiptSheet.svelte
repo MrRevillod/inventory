@@ -66,58 +66,69 @@
 	function download() {
 		if (blob) downloadBlob(blob, filename)
 	}
+
+	/** Share when the platform can, download otherwise. */
+	function primaryAction() {
+		if (shareable) void share()
+		else download()
+	}
 </script>
 
 <BottomSheet open={receipt !== null} title="Boleta" {onclose}>
-	<div class="flex items-center justify-center gap-2 pb-3 text-sm font-semibold text-primary-600">
-		<Check size={16} />
-		Venta registrada
-	</div>
+	<div class="flex min-h-[74dvh] flex-col">
+		<div class="flex items-center justify-center gap-2 pb-3 text-sm font-semibold text-primary-600">
+			<Check size={16} />
+			Venta registrada
+		</div>
 
-	{#if preview}
-		<img
-			src={preview}
-			alt="Boleta de la venta"
-			class="w-full rounded-2xl ring-1 ring-neutral-200/70"
-		>
-	{:else}
-		<div
-			class="flex aspect-[3/4] w-full items-center justify-center rounded-2xl bg-neutral-100 text-sm text-neutral-400"
-		>
-			{#if drawing}
-				Generando imagen…
+		<div class="flex min-h-0 flex-1 items-start justify-center overflow-y-auto">
+			{#if preview}
+				<img
+					src={preview}
+					alt="Boleta de la venta"
+					class="w-full rounded-2xl ring-1 ring-neutral-200/70"
+				>
 			{:else}
-				Sin imagen
+				<div
+					class="flex aspect-[3/4] w-full items-center justify-center rounded-2xl bg-neutral-100 text-sm text-neutral-400"
+				>
+					{#if drawing}
+						Generando imagen…
+					{:else}
+						Sin imagen
+					{/if}
+				</div>
 			{/if}
 		</div>
-	{/if}
 
-	<div class="mt-4 space-y-2">
-		{#if shareable}
+		<p class="pt-3 pb-2 text-center text-xs text-neutral-400">
+			{shareable
+				? "Elige WhatsApp u otra app en el menú de compartir."
+				: "Puedes guardar la imagen y enviarla por tu cuenta."}
+		</p>
+
+		<div class="grid grid-cols-[auto_1fr] gap-2">
 			<button
 				type="button"
-				onclick={share}
-				disabled={!blob}
-				class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-600 py-4 text-base font-bold text-white shadow-lg shadow-primary-600/25 transition-transform active:scale-[0.98] disabled:opacity-40"
+				onclick={onclose}
+				class="rounded-2xl border border-neutral-200 px-6 py-3.5 text-sm font-semibold text-neutral-600 transition-colors active:bg-neutral-100"
 			>
-				<Share2 size={18} />
-				Compartir
+				Salir
 			</button>
-		{/if}
-		<button
-			type="button"
-			onclick={download}
-			disabled={!blob}
-			class="flex w-full items-center justify-center gap-2 rounded-2xl border border-neutral-200 py-3.5 text-sm font-semibold text-neutral-600 transition-colors active:bg-neutral-100 disabled:opacity-40"
-		>
-			<Download size={16} />
-			Descargar imagen
-		</button>
+			<button
+				type="button"
+				onclick={primaryAction}
+				disabled={!blob}
+				class="flex items-center justify-center gap-2 rounded-2xl bg-primary-600 py-3.5 text-base font-bold text-white shadow-lg shadow-primary-600/25 transition-transform active:scale-[0.98] disabled:opacity-40"
+			>
+				{#if shareable}
+					<Share2 size={18} />
+					Compartir
+				{:else}
+					<Download size={18} />
+					Descargar
+				{/if}
+			</button>
+		</div>
 	</div>
-
-	<p class="mt-3 text-center text-xs text-neutral-400">
-		{shareable
-			? "Elige WhatsApp u otra app en el menú de compartir."
-			: "Puedes guardar la imagen y enviarla por tu cuenta."}
-	</p>
 </BottomSheet>
